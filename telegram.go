@@ -103,11 +103,20 @@ func (t *Telegram) HandleNewUsers() error {
 
 			statement, err := t.db.Prepare("INSERT INTO chats (id) VALUES (?)")
 			if err != nil {
-				return err
+				fmt.Println(err)
+				continue
 			}
 			_, err = statement.Exec(update.Message.Chat.ID)
 			if err != nil {
-				return err
+				if err.Error() == "UNIQUE constraint failed: chats.id" {
+					err = t.SendMessage("You are already added to the subscription list, you will receive appointments shortly", update.Message.Chat.ID)
+					if err != nil {
+						fmt.Println(err)
+					}
+					continue
+				}
+				fmt.Println(err)
+				continue
 			}
 			err = t.SendMessage("Added to the subscription list, you will receive appointments shortly", update.Message.Chat.ID)
 			if err != nil {
@@ -118,11 +127,13 @@ func (t *Telegram) HandleNewUsers() error {
 
 			statement, err := t.db.Prepare("DELETE FROM chats WHERE id = (?)")
 			if err != nil {
-				return err
+				fmt.Println(err)
+				continue
 			}
 			_, err = statement.Exec(update.Message.Chat.ID)
 			if err != nil {
-				return err
+				fmt.Println(err)
+				continue
 			}
 			err = t.SendMessage("Removed from the list successfully", update.Message.Chat.ID)
 			if err != nil {
