@@ -28,13 +28,13 @@ func fetchAllAppointment(fetchers []Fetcher, bot *Telegram) {
 	for _, fetcher := range fetchers {
 		fetcher := fetcher
 		go func() {
-			fmt.Println("Starting fetch")
+			fmt.Println("Starting fetch\n")
 			res, err := fetcher.Fetch()
 			if err != nil {
 				errChan <- err
 				return
 			}
-			fmt.Printf("Received %d result", len(res))
+			fmt.Printf("Received %d result\n", len(res))
 			if fetcher.ResultSendLastAt().Before(time.Now().Add(-20 * time.Second)) {
 				fetcher.ResultSentNow()
 				for _, r := range res {
@@ -45,7 +45,7 @@ func fetchAllAppointment(fetchers []Fetcher, bot *Telegram) {
 					}
 					bot.SendMessage(message)
 				}
-				fmt.Printf("messages sent on telegram")
+				fmt.Printf("messages sent on telegram\n")
 			}
 			done <- true
 		}()
@@ -71,7 +71,7 @@ func init() {
 	viper.AddConfigPath(".")
 	err := viper.ReadInConfig()
 	if err != nil {
-		panic(fmt.Errorf("fatal error config file: %s \n", err))
+		panic(fmt.Errorf("fatal error config file: %s", err))
 	}
 }
 
