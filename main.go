@@ -12,6 +12,7 @@ import (
 type Result struct {
 	VaccineName string
 	Amount      int64
+	Message     *string
 }
 
 type Fetcher interface {
@@ -38,12 +39,16 @@ func fetchAllAppointment(fetchers []Fetcher, bot *Telegram) {
 			if fetcher.ResultSendLastAt().Before(time.Now().Add(-20 * time.Second)) {
 				fetcher.ResultSentNow()
 				for _, r := range res {
-					message, err := fetcher.FormatMessage(r)
-					if err != nil {
-						errChan <- err
-						return
+					if r.Message != nil {
+						message, err := fetcher.FormatMessage(r)
+						if err != nil {
+							errChan <- err
+							return
+						}
+						bot.SendMessage(message)
+					} else {
+						bot.SendMessage(*r.Message)
 					}
-					bot.SendMessage(message)
 				}
 				fmt.Printf("messages sent on telegram\n")
 			}
@@ -82,6 +87,7 @@ func main() {
 	}
 	sources := []Fetcher{
 		&PuntoMedico{},
+		&VaccineCenter{},
 	}
 
 	telegram := NewBot(bot, viper.GetInt64("telegram-channels"))

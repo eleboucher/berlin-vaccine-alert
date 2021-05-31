@@ -16,7 +16,7 @@ type PuntoMedico struct {
 	resultSendLastAt time.Time
 }
 
-type Message struct {
+type TMessage struct {
 	Terminsuchen          []Terminsuchen `json:"terminsuchen"`
 	Termine               [][]*string    `json:"termine"`
 	TermineProBezeichnung [][][]*string  `json:"termineProBezeichnung"`
@@ -56,7 +56,7 @@ func (p *PuntoMedico) Fetch() ([]*Result, error) {
 	if err != nil {
 		return nil, err
 	}
-	var resp Message
+	var resp TMessage
 	err = json.Unmarshal(body, &resp)
 	if err != nil {
 		return nil, err
