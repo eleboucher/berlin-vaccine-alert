@@ -39,7 +39,7 @@ func fetchAllAppointment(fetchers []Fetcher, bot *Telegram) {
 			if len(res) > 0 && fetcher.ResultSendLastAt().Before(time.Now().Add(-20*time.Second)) {
 				fetcher.ResultSentNow()
 				for _, r := range res {
-					if r.Message != nil {
+					if r.Message == nil {
 						message, err := fetcher.FormatMessage(r)
 						if err != nil {
 							errChan <- err
