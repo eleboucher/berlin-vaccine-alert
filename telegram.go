@@ -108,6 +108,10 @@ func (t *Telegram) HandleNewUsers() error {
 			if err != nil {
 				return err
 			}
+			err = t.SendMessage("Added to the subscription list, you will receive appointments shortly", update.Message.Chat.ID)
+			if err != nil {
+				fmt.Println(err)
+			}
 		case "stop":
 			fmt.Printf("removing chat %d\n", update.Message.Chat.ID)
 
