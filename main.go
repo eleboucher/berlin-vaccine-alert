@@ -45,13 +45,13 @@ func fetchAllAppointment(fetchers []Fetcher, bot *Telegram) {
 							errChan <- err
 							return
 						}
-						err = bot.SendMessage(message)
+						err = bot.SendMessageToAllUser(message)
 						if err != nil {
 							errChan <- err
 							return
 						}
 					} else {
-						bot.SendMessage(*r.Message)
+						bot.SendMessageToAllUser(*r.Message)
 						if err != nil {
 							errChan <- err
 							return
@@ -89,16 +89,31 @@ func init() {
 }
 
 func main() {
-	bot, err := tgbotapi.NewBotAPI(viper.GetString("telegram-token"))
+	db, err := NewDB()
 	if err != nil {
+		fmt.Println(err)
 		return
 	}
+	bot, err := tgbotapi.NewBotAPI(viper.GetString("telegram-token"))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	telegram := NewBot(bot, db)
+
+	go func() {
+		err := telegram.HandleNewUsers()
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+	}()
+
 	sources := []Fetcher{
 		&PuntoMedico{},
 		&VaccineCenter{},
 	}
 
-	telegram := NewBot(bot, viper.GetInt64("telegram-channel"))
 	for range time.Tick(5 * time.Second) {
 		go fetchAllAppointment(sources, telegram)
 	}
