@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
@@ -17,6 +19,7 @@ func NewBot(bot *tgbotapi.BotAPI, channel int64) *Telegram {
 }
 
 func (t *Telegram) SendMessage(message string) error {
+	fmt.Printf("sending message %s on channel %d", message, t.channel)
 	msg := tgbotapi.NewMessage(t.channel, message)
 	_, err := t.bot.Send(msg)
 	if err != nil {
