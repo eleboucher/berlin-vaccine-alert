@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-const tPunto = "{{.Amount}} {{.VaccineName}} available https://punctum-medico.de/onlinetermine/"
+const tPunto = "{{.Amount}} appointments for {{.VaccineName}} available https://punctum-medico.de/onlinetermine/"
 
 type PuntoMedico struct {
 	resultSendLastAt time.Time
