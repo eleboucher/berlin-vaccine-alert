@@ -92,6 +92,9 @@ func (t *Telegram) HandleNewUsers() error {
 		if update.Message == nil { // ignore any non-Message Updates
 			continue
 		}
+		if !update.Message.IsCommand() { // ignore any non-command Messages
+			continue
+		}
 
 		switch update.Message.Command() {
 		case "start":
