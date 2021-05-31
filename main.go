@@ -45,9 +45,17 @@ func fetchAllAppointment(fetchers []Fetcher, bot *Telegram) {
 							errChan <- err
 							return
 						}
-						bot.SendMessage(message)
+						err = bot.SendMessage(message)
+						if err != nil {
+							errChan <- err
+							return
+						}
 					} else {
 						bot.SendMessage(*r.Message)
+						if err != nil {
+							errChan <- err
+							return
+						}
 					}
 				}
 				fmt.Printf("messages sent on telegram\n")
@@ -90,7 +98,7 @@ func main() {
 		&VaccineCenter{},
 	}
 
-	telegram := NewBot(bot, viper.GetInt64("telegram-channels"))
+	telegram := NewBot(bot, viper.GetInt64("telegram-channel"))
 	for range time.Tick(5 * time.Second) {
 		go fetchAllAppointment(sources, telegram)
 	}
