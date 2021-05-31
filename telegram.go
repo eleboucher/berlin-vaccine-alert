@@ -93,7 +93,8 @@ func (t *Telegram) HandleNewUsers() error {
 			continue
 		}
 
-		if update.Message.Command() == "start" {
+		switch update.Message.Command() {
+		case "start":
 			fmt.Printf("adding chat %d\n", update.Message.Chat.ID)
 
 			statement, err := t.db.Prepare("INSERT INTO chats (id) VALUES (?)")
@@ -104,7 +105,23 @@ func (t *Telegram) HandleNewUsers() error {
 			if err != nil {
 				return err
 			}
+		case "stop":
+			fmt.Printf("removing chat %d\n", update.Message.Chat.ID)
+
+			statement, err := t.db.Prepare("DELETE FROM chats WHERE id = (?)")
+			if err != nil {
+				return err
+			}
+			_, err = statement.Exec(update.Message.Chat.ID)
+			if err != nil {
+				return err
+			}
+			err = t.SendMessage("Removed from the list successfully", update.Message.Chat.ID)
+			if err != nil {
+				fmt.Println(err)
+			}
 		}
+
 	}
 	return nil
 }
