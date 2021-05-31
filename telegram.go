@@ -88,6 +88,7 @@ func (t *Telegram) HandleNewUsers() error {
 	if err != nil {
 		return err
 	}
+
 	for update := range updates {
 		if update.Message == nil { // ignore any non-Message Updates
 			continue
@@ -130,5 +131,6 @@ func (t *Telegram) HandleNewUsers() error {
 		}
 
 	}
+	fmt.Println("done with telegram handler")
 	return nil
 }

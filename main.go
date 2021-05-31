@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/spf13/viper"
@@ -101,7 +102,17 @@ func main() {
 	}
 	telegram := NewBot(bot, db)
 
+	sources := []Fetcher{
+		&PuntoMedico{},
+		&VaccineCenter{},
+	}
+
+	var wg sync.WaitGroup
+
+	wg.Add(2)
+
 	go func() {
+		defer wg.Done()
 		err := telegram.HandleNewUsers()
 		if err != nil {
 			fmt.Println(err)
@@ -109,12 +120,12 @@ func main() {
 		}
 	}()
 
-	sources := []Fetcher{
-		&PuntoMedico{},
-		&VaccineCenter{},
-	}
+	go func() {
+		defer wg.Done()
+		for range time.Tick(5 * time.Second) {
+			go fetchAllAppointment(sources, telegram)
+		}
+	}()
 
-	for range time.Tick(5 * time.Second) {
-		go fetchAllAppointment(sources, telegram)
-	}
+	wg.Wait()
 }
