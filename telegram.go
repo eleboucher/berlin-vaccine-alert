@@ -24,7 +24,14 @@ func NewBot(bot *tgbotapi.BotAPI, db *sql.DB) *Telegram {
 
 func (t *Telegram) SendMessage(message string, channel int64) error {
 	fmt.Printf("sending message %s on channel %d", message, channel)
-	msg := tgbotapi.NewMessage(channel, message)
+	msg := tgbotapi.MessageConfig{
+		BaseChat: tgbotapi.BaseChat{
+			ChatID:           channel,
+			ReplyToMessageID: 0,
+		},
+		Text:                  message,
+		DisableWebPagePreview: true,
+	}
 	_, err := t.bot.Send(msg)
 	if err != nil {
 		return err
@@ -109,7 +116,7 @@ func (t *Telegram) HandleNewUsers() error {
 			_, err = statement.Exec(update.Message.Chat.ID)
 			if err != nil {
 				if err.Error() == "UNIQUE constraint failed: chats.id" {
-					err = t.SendMessage("You are already added to the subscription list, you will receive appointments shortly", update.Message.Chat.ID)
+					err = t.SendMessage("Hey Again! You are already added to the subscription list, you will receive appointments shortly when they will be available", update.Message.Chat.ID)
 					if err != nil {
 						fmt.Println(err)
 					}
@@ -118,7 +125,7 @@ func (t *Telegram) HandleNewUsers() error {
 				fmt.Println(err)
 				continue
 			}
-			err = t.SendMessage("Added to the subscription list, you will receive appointments shortly", update.Message.Chat.ID)
+			err = t.SendMessage("Welcome 👋🏼! You are now added to the subscription list, you will receive appointments shortly when they will be available", update.Message.Chat.ID)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -135,7 +142,12 @@ func (t *Telegram) HandleNewUsers() error {
 				fmt.Println(err)
 				continue
 			}
-			err = t.SendMessage("Removed from the list successfully", update.Message.Chat.ID)
+			err = t.SendMessage("Removed from the list successfully. if you want to receive messages again type /start", update.Message.Chat.ID)
+			if err != nil {
+				fmt.Println(err)
+			}
+		case "contribute":
+			err = t.SendMessage("Hey you 🚀, Thanks a lot for using the bot,\n Feel free to contribute on Github: https://github.com/eleboucher/berlin-vaccine-alert\nOr feel free to contribute on Paypal https://paypal.me/ELeboucher or Buy me a beer https://www.buymeacoffee.com/eleboucher", update.Message.Chat.ID)
 			if err != nil {
 				fmt.Println(err)
 			}
