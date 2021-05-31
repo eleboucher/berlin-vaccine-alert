@@ -36,7 +36,7 @@ func fetchAllAppointment(fetchers []Fetcher, bot *Telegram) {
 				return
 			}
 			fmt.Printf("Received %d result\n", len(res))
-			if len(res) > 0 && fetcher.ResultSendLastAt().Before(time.Now().Add(-20*time.Second)) {
+			if len(res) > 0 && fetcher.ResultSendLastAt().Before(time.Now().Add(-1*time.Minute)) {
 				fetcher.ResultSentNow()
 				for _, r := range res {
 					if r.Message == nil {
