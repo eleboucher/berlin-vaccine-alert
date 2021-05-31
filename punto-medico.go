@@ -12,6 +12,12 @@ import (
 
 const tPunto = "{{.Amount}} appointments for {{.VaccineName}} available https://punctum-medico.de/onlinetermine/"
 
+var vaccines = []string{
+	"AstraZeneca",
+	"Johnson",
+	"Biontech",
+}
+
 type PuntoMedico struct {
 	resultSendLastAt time.Time
 }
@@ -66,7 +72,7 @@ func (p *PuntoMedico) Fetch() ([]*Result, error) {
 
 	for _, a := range resp.Terminsuchen {
 		// Remove second dose vaccine for now
-		if !strings.Contains(a.Name, "Zweitimpfung") {
+		if !strings.Contains(a.Name, "Zweitimpfung") && isVaccine(a.Name) {
 			ret = append(ret, &Result{
 				VaccineName: a.Name,
 				Amount:      a.Nr,
@@ -74,6 +80,15 @@ func (p *PuntoMedico) Fetch() ([]*Result, error) {
 		}
 	}
 	return ret, nil
+}
+
+func isVaccine(name string) bool {
+	for _, vaccine := range vaccines {
+		if strings.Contains(name, vaccine) {
+			return true
+		}
+	}
+	return false
 }
 
 func (p *PuntoMedico) ResultSendLastAt() time.Time {
