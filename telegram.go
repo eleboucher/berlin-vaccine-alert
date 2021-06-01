@@ -201,7 +201,7 @@ func (t *Telegram) HandleNewUsers() error {
 					fmt.Println(err)
 					return
 				}
-				err = t.SendMessage("subscribed to Vaccination centers updates", update.Message.Chat.ID)
+				err = t.SendMessage("subscribed to Biontech/Pfizer updates", update.Message.Chat.ID)
 				if err != nil {
 					fmt.Println(err)
 					return
