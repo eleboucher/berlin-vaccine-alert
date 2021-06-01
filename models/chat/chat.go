@@ -13,6 +13,7 @@ var (
 
 	fields = []string{
 		"id",
+		"filters",
 	}
 
 	preparedFields = strings.Join(fields, ", ")
@@ -20,7 +21,8 @@ var (
 
 // Chat holds the information for a telegram chat
 type Chat struct {
-	ID int64
+	ID      int64
+	Filters []string
 }
 
 // Model holds the information for the model

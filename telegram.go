@@ -3,11 +3,53 @@ package main
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"sync"
 
 	"github.com/eleboucher/covid/models/chat"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/spf13/viper"
+)
+
+const (
+	startButton      = "Start"
+	stopButton       = "Stop"
+	filterButton     = "Add filters (multiple choices available)"
+	azButton         = "Look for AztraZeneca"
+	jjButton         = "Look for Johnson & Johnson"
+	vcButton         = "Look For Vaccination Centers"
+	everythingButton = "Look for everything"
+	contributeButton = "Contribute"
+	infoFilterButton = "Info about filters"
+	backButton       = "Back"
+)
+
+var keyboard = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton(startButton),
+		tgbotapi.NewKeyboardButton(stopButton),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton(filterButton),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton(contributeButton),
+	),
+)
+
+var filtersKeyboard = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton(azButton),
+		tgbotapi.NewKeyboardButton(jjButton),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton(vcButton),
+		tgbotapi.NewKeyboardButton(everythingButton),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton(infoFilterButton),
+		tgbotapi.NewKeyboardButton(backButton),
+	),
 )
 
 // Telegram Holds the structure for the telegram bot
@@ -44,8 +86,8 @@ func (t *Telegram) SendMessage(message string, channel int64) error {
 }
 
 // SendMessageToAllUser send a message to all the enabled users
-func (t *Telegram) SendMessageToAllUser(message string) error {
-	chats, err := t.chatModel.List()
+func (t *Telegram) SendMessageToAllUser(result *Result) error {
+	chats, err := t.chatModel.List(result.VaccineName)
 	if err != nil {
 		return err
 	}
@@ -56,7 +98,7 @@ func (t *Telegram) SendMessageToAllUser(message string) error {
 		chat := chat
 		go func() {
 			defer wg.Done()
-			err := t.SendMessage(message, chat.ID)
+			err := t.SendMessage(result.Message, chat.ID)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -64,7 +106,7 @@ func (t *Telegram) SendMessageToAllUser(message string) error {
 	}
 	go func() {
 		wg.Done()
-		err := t.SendMessage(message, viper.GetInt64("telegram-channel"))
+		err := t.SendMessage(result.Message, viper.GetInt64("telegram-channel"))
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -87,44 +129,105 @@ func (t *Telegram) HandleNewUsers() error {
 		if update.Message == nil { // ignore any non-Message Updates
 			continue
 		}
-		if !update.Message.IsCommand() { // ignore any non-command Messages
-			continue
+
+		msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
+		switch update.Message.Text {
+		case "open", backButton:
+			msg.ReplyMarkup = keyboard
+			t.bot.Send(msg)
+		case "close":
+			msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
+			t.bot.Send(msg)
+		case contributeButton:
+			err = t.SendMessage("Hey you 🚀,\n Thanks a lot for using the bot,\n\n\nFeel free to contribute on Github: https://github.com/eleboucher/berlin-vaccine-alert\n\n\nOr feel free to contribute on Paypal https://paypal.me/ELeboucher or Buy me a beer https://www.buymeacoffee.com/eleboucher", update.Message.Chat.ID)
+			if err != nil {
+				fmt.Println(err)
+			}
+		case filterButton:
+			msg.ReplyMarkup = filtersKeyboard
+			t.bot.Send(msg)
+		case stopButton:
+			err := t.stopChat(update.Message.Chat.ID)
+			if err != nil {
+				fmt.Println(err)
+			}
+		case startButton:
+			err := t.startChat(update.Message.Chat.ID)
+			if err != nil {
+				fmt.Println(err)
+			}
+		case azButton:
+			_, err := t.chatModel.UpdateFilters(update.Message.Chat.ID, AstraZeneca)
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+			err = t.SendMessage("subscribed to AstraZeneca updates", update.Message.Chat.ID)
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+		case jjButton:
+			_, err := t.chatModel.UpdateFilters(update.Message.Chat.ID, JohnsonAndJohnson)
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+			err = t.SendMessage("subscribed to Johnson And Johnson updates", update.Message.Chat.ID)
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+		case vcButton:
+			_, err := t.chatModel.UpdateFilters(update.Message.Chat.ID, VaccinationCenter)
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+			err = t.SendMessage("subscribed to Vaccination centers updates", update.Message.Chat.ID)
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+		case everythingButton:
+			_, err := t.chatModel.UpdateFilters(update.Message.Chat.ID, "")
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+			err = t.SendMessage("subscribed to every updates", update.Message.Chat.ID)
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+		case infoFilterButton:
+			chat, err := t.chatModel.Find(update.Message.Chat.ID)
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+			var filters string
+			if len(chat.Filters) == 0 {
+				filters = "unfiltered"
+			} else {
+				filters = strings.Join(chat.Filters, "\n")
+			}
+			msg := fmt.Sprintf("your current filters are :\n%s\n\nSelect %s to reset them", filters, everythingButton)
+			err = t.SendMessage(msg, update.Message.Chat.ID)
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
 		}
 
 		switch update.Message.Command() {
 		case "start":
-			fmt.Printf("adding chat %d\n", update.Message.Chat.ID)
-
-			_, err := t.chatModel.Create(update.Message.Chat.ID)
-			if err != nil {
-				if errors.Is(err, chat.ErrChatAlreadyExist) {
-					_, err := t.chatModel.Enable(update.Message.Chat.ID)
-					if err != nil {
-						fmt.Println(err)
-						continue
-					}
-					err = t.SendMessage("Hey Again! You are already added to the subscription list, you will receive appointments shortly when they will be available", update.Message.Chat.ID)
-					if err != nil {
-						fmt.Println(err)
-					}
-					continue
-				}
-				fmt.Println(err)
-				continue
-			}
-			err = t.SendMessage("Welcome 👋🏼! You are now added to the subscription list, you will receive appointments shortly when they will be available", update.Message.Chat.ID)
+			err := t.startChat(update.Message.Chat.ID)
 			if err != nil {
 				fmt.Println(err)
 			}
 		case "stop":
-			fmt.Printf("removing chat %d\n", update.Message.Chat.ID)
-
-			_, err := t.chatModel.Delete(update.Message.Chat.ID)
-			if err != nil {
-				fmt.Println(err)
-				continue
-			}
-			err = t.SendMessage("Removed from the list successfully. if you want to receive messages again type /start", update.Message.Chat.ID)
+			err := t.stopChat(update.Message.Chat.ID)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -137,5 +240,45 @@ func (t *Telegram) HandleNewUsers() error {
 
 	}
 	fmt.Println("done with telegram handler")
+	return nil
+}
+
+func (t *Telegram) startChat(chatID int64) error {
+	fmt.Printf("adding chat %d\n", chatID)
+
+	_, err := t.chatModel.Create(chatID)
+	if err != nil {
+		if errors.Is(err, chat.ErrChatAlreadyExist) {
+			_, err := t.chatModel.Enable(chatID)
+			if err != nil {
+				return err
+			}
+			err = t.SendMessage("Hey Again! You are already added to the subscription list, you will receive appointments shortly when they will be available", chatID)
+			if err != nil {
+				return err
+			}
+			return err
+		}
+		fmt.Println(err)
+		return err
+	}
+	err = t.SendMessage("Welcome 👋🏼! You are now added to the subscription list, you will receive appointments shortly when they will be available", chatID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (t *Telegram) stopChat(chatID int64) error {
+	fmt.Printf("removing chat %d\n", chatID)
+
+	_, err := t.chatModel.Delete(chatID)
+	if err != nil {
+		return err
+	}
+	err = t.SendMessage("Removed from the list successfully. if you want to receive messages again type /start", chatID)
+	if err != nil {
+		return err
+	}
 	return nil
 }

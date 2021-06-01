@@ -7,7 +7,7 @@ import (
 
 const (
 	// AstraZeneca is the name of the astrazeneca vaccine
-	AstraZeneca = "astrazeneca"
+	AstraZeneca = "astra"
 	// JohnsonAndJohnson is the name for the JohnsonAndJohnson vaccine
 	JohnsonAndJohnson = "johnson"
 	// Biontech is the name for the biontech/pfizer vaccine
@@ -32,6 +32,7 @@ var vaccines = []string{
 }
 
 func getVaccineName(name string) (string, error) {
+
 	for _, vaccine := range vaccines {
 		if strings.Contains(strings.ToLower(name), vaccine) {
 			return vaccine, nil

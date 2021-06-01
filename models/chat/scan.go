@@ -2,17 +2,23 @@ package chat
 
 import (
 	"database/sql"
+	"strings"
 
 	sq "github.com/Masterminds/squirrel"
 )
 
 func scanRow(scanner sq.RowScanner) (*Chat, error) {
+	var filters *string
 
 	chat := &Chat{}
-
 	err := scanner.Scan(
 		&chat.ID,
+		&filters,
 	)
+
+	if filters != nil {
+		chat.Filters = strings.Split(*filters, ",")
+	}
 	if err != nil {
 		return nil, err
 	}
