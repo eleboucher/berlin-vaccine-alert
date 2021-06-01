@@ -15,7 +15,7 @@ const (
 	startButton      = "Start"
 	stopButton       = "Stop"
 	filterButton     = "Add filters (multiple choices available)"
-	azButton         = "Look for AztraZeneca"
+	azButton         = "Look for AstraZeneca"
 	jjButton         = "Look for Johnson & Johnson"
 	vcButton         = "Look For Vaccination Centers"
 	everythingButton = "Look for everything"
