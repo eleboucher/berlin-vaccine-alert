@@ -18,7 +18,7 @@ const (
 	azButton         = "Look for AstraZeneca"
 	jjButton         = "Look for Johnson & Johnson"
 	biontechButton   = "Look for Biontech/Pfizer (not in vaccination centers)"
-	vcButton         = "Look For Vaccination Centers"
+	vcButton         = "Look for Vaccination Centers"
 	everythingButton = "Look for everything"
 	contributeButton = "Contribute"
 	infoFilterButton = "Info about filters"
