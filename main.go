@@ -96,6 +96,7 @@ func main() {
 	sources := []Fetcher{
 		&PuntoMedico{},
 		&VaccineCenter{},
+		&MedicoLeopoldPlatz{},
 	}
 
 	var wg sync.WaitGroup
