@@ -139,7 +139,7 @@ func (t *Telegram) HandleNewUsers() error {
 			msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
 			t.bot.Send(msg)
 		case contributeButton:
-			err = t.SendMessage("Hey you 🚀,\n Thanks a lot for using the bot,\n\n\nFeel free to contribute on Github: https://github.com/eleboucher/berlin-vaccine-alert\n\n\nOr feel free to contribute on Paypal https://paypal.me/ELeboucher or Buy me a beer https://www.buymeacoffee.com/eleboucher", update.Message.Chat.ID)
+			err = t.SendMessage("Hey you 🚀,\nThanks a lot for using the bot,\n\n\nFeel free to contribute on Github: https://github.com/eleboucher/berlin-vaccine-alert\n\n\nOr feel free to contribute on Paypal https://paypal.me/ELeboucher or Buy me a beer https://www.buymeacoffee.com/eleboucher", update.Message.Chat.ID)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -235,7 +235,7 @@ func (t *Telegram) HandleNewUsers() error {
 			msg.ReplyMarkup = filtersKeyboard
 			t.bot.Send(msg)
 		case "contribute":
-			err = t.SendMessage("Hey you 🚀,\n Thanks a lot for using the bot,\n\n\nFeel free to contribute on Github: https://github.com/eleboucher/berlin-vaccine-alert\n\n\nOr feel free to contribute on Paypal https://paypal.me/ELeboucher or Buy me a beer https://www.buymeacoffee.com/eleboucher", update.Message.Chat.ID)
+			err = t.SendMessage("Hey you 🚀,\nThanks a lot for using the bot,\n\n\nFeel free to contribute on Github: https://github.com/eleboucher/berlin-vaccine-alert\n\n\nOr feel free to contribute on Paypal https://paypal.me/ELeboucher or Buy me a beer https://www.buymeacoffee.com/eleboucher", update.Message.Chat.ID)
 			if err != nil {
 				fmt.Println(err)
 			}
