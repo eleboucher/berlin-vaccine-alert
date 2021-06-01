@@ -2,26 +2,31 @@ package main
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"sync"
 
+	"github.com/eleboucher/covid/models/chat"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/spf13/viper"
 )
 
+// Telegram Holds the structure for the telegram bot
 type Telegram struct {
-	db      *sql.DB
-	bot     *tgbotapi.BotAPI
-	channel int64
+	bot       *tgbotapi.BotAPI
+	channel   int64
+	chatModel *chat.Model
 }
 
-func NewBot(bot *tgbotapi.BotAPI, db *sql.DB) *Telegram {
+// NewBot return a new Telegram Bot
+func NewBot(bot *tgbotapi.BotAPI, chatModel *chat.Model) *Telegram {
 	return &Telegram{
-		bot: bot,
-		db:  db,
+		bot:       bot,
+		chatModel: chatModel,
 	}
 }
 
+// SendMessage send a message in string to a channel id
 func (t *Telegram) SendMessage(message string, channel int64) error {
 	fmt.Printf("sending message %s on channel %d", message, channel)
 	msg := tgbotapi.MessageConfig{
@@ -39,23 +44,20 @@ func (t *Telegram) SendMessage(message string, channel int64) error {
 	return nil
 }
 
+// SendMessageToAllUser send a message to all the enabled users
 func (t *Telegram) SendMessageToAllUser(message string) error {
-	rows, err := t.db.Query("SELECT id FROM chats")
-	if err != nil {
-		return err
-	}
-	ids, err := scanRows(rows)
+	chats, err := t.chatModel.List()
 	if err != nil {
 		return err
 	}
 	var wg sync.WaitGroup
-	wg.Add(len(ids) + 1)
+	wg.Add(len(chats) + 1)
 
-	for _, id := range ids {
-		id := id
+	for _, chat := range chats {
+		chat := chat
 		go func() {
 			defer wg.Done()
-			err := t.SendMessage(message, id)
+			err := t.SendMessage(message, chat.ID)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -87,6 +89,7 @@ func scanRows(rows *sql.Rows) ([]int64, error) {
 	return entries, nil
 }
 
+// HandleNewUsers handle the commands from telegrams
 func (t *Telegram) HandleNewUsers() error {
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
@@ -108,14 +111,14 @@ func (t *Telegram) HandleNewUsers() error {
 		case "start":
 			fmt.Printf("adding chat %d\n", update.Message.Chat.ID)
 
-			statement, err := t.db.Prepare("INSERT INTO chats (id) VALUES (?)")
+			_, err := t.chatModel.Create(update.Message.Chat.ID)
 			if err != nil {
-				fmt.Println(err)
-				continue
-			}
-			_, err = statement.Exec(update.Message.Chat.ID)
-			if err != nil {
-				if err.Error() == "UNIQUE constraint failed: chats.id" {
+				if errors.Is(err, chat.ErrChatAlreadyExist) {
+					_, err := t.chatModel.Enable(update.Message.Chat.ID)
+					if err != nil {
+						fmt.Println(err)
+						continue
+					}
 					err = t.SendMessage("Hey Again! You are already added to the subscription list, you will receive appointments shortly when they will be available", update.Message.Chat.ID)
 					if err != nil {
 						fmt.Println(err)
@@ -132,12 +135,7 @@ func (t *Telegram) HandleNewUsers() error {
 		case "stop":
 			fmt.Printf("removing chat %d\n", update.Message.Chat.ID)
 
-			statement, err := t.db.Prepare("DELETE FROM chats WHERE id = (?)")
-			if err != nil {
-				fmt.Println(err)
-				continue
-			}
-			_, err = statement.Exec(update.Message.Chat.ID)
+			_, err := t.chatModel.Delete(update.Message.Chat.ID)
 			if err != nil {
 				fmt.Println(err)
 				continue

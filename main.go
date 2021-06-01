@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/eleboucher/covid/models/chat"
 	"github.com/spf13/viper"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
@@ -89,7 +90,8 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	telegram := NewBot(bot, db)
+	chatModel := chat.NewModel(db)
+	telegram := NewBot(bot, chatModel)
 
 	sources := []Fetcher{
 		&PuntoMedico{},
