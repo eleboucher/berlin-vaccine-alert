@@ -13,14 +13,13 @@ import (
 type Result struct {
 	VaccineName string
 	Amount      int64
-	Message     *string
+	Message     string
 }
 
 type Fetcher interface {
 	Fetch() ([]*Result, error)
 	ResultSendLastAt() time.Time
 	ResultSentNow()
-	FormatMessage(result *Result) (string, error)
 }
 
 func fetchAllAppointment(fetchers []Fetcher, bot *Telegram) {
@@ -30,7 +29,7 @@ func fetchAllAppointment(fetchers []Fetcher, bot *Telegram) {
 	for _, fetcher := range fetchers {
 		fetcher := fetcher
 		go func() {
-			fmt.Println("Starting fetch\n")
+			fmt.Println("Starting fetch")
 			res, err := fetcher.Fetch()
 			if err != nil {
 				errChan <- err
@@ -40,26 +39,14 @@ func fetchAllAppointment(fetchers []Fetcher, bot *Telegram) {
 			if len(res) > 0 && fetcher.ResultSendLastAt().Before(time.Now().Add(-1*time.Minute)) {
 				fetcher.ResultSentNow()
 				for _, r := range res {
-					if r.Message == nil {
-						message, err := fetcher.FormatMessage(r)
-						if err != nil {
-							errChan <- err
-							return
-						}
-						err = bot.SendMessageToAllUser(message)
-						if err != nil {
-							errChan <- err
-							return
-						}
-					} else {
-						bot.SendMessageToAllUser(*r.Message)
-						if err != nil {
-							errChan <- err
-							return
-						}
+
+					bot.SendMessageToAllUser(r.Message)
+					if err != nil {
+						errChan <- err
+						return
 					}
 				}
-				fmt.Printf("messages sent on telegram\n")
+				fmt.Println("messages sent on telegram")
 			}
 			done <- true
 		}()

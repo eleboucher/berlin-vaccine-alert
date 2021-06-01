@@ -66,7 +66,10 @@ func (v *VaccineCenter) Fetch() ([]*Result, error) {
 	for _, a := range resp.Stats {
 		if a.Open {
 			message := fmt.Sprintf("Appointment available at %s %s", a.Name, idToURL(a.ID))
-			ret = append(ret, &Result{Message: &message})
+			ret = append(ret, &Result{
+				Message:     message,
+				VaccineName: VaccinationCenter,
+			})
 		}
 	}
 	return ret, nil

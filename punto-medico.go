@@ -10,13 +10,7 @@ import (
 	"time"
 )
 
-const tPunto = "{{.Amount}} appointments for {{.VaccineName}} available https://punctum-medico.de/onlinetermine/"
-
-var vaccines = []string{
-	"AstraZeneca",
-	"Johnson",
-	"Biontech",
-}
+const tPunto = "{{.Nr}} appointments for {{.Name}} available https://punctum-medico.de/onlinetermine/"
 
 type PuntoMedico struct {
 	resultSendLastAt time.Time
@@ -72,23 +66,21 @@ func (p *PuntoMedico) Fetch() ([]*Result, error) {
 
 	for _, a := range resp.Terminsuchen {
 		// Remove second dose vaccine for now
-		if !strings.Contains(a.Name, "Zweitimpfung") && isVaccine(a.Name) {
-			ret = append(ret, &Result{
-				VaccineName: a.Name,
-				Amount:      a.Nr,
-			})
+		if !strings.Contains(a.Name, "Zweitimpfung") {
+			if vaccineName, err := getVaccineName(a.Name); err != nil {
+				message, err := p.FormatMessage(a)
+				if err != nil {
+					return nil, err
+				}
+				ret = append(ret, &Result{
+					VaccineName: vaccineName,
+					Amount:      a.Nr,
+					Message:     message,
+				})
+			}
 		}
 	}
 	return ret, nil
-}
-
-func isVaccine(name string) bool {
-	for _, vaccine := range vaccines {
-		if strings.Contains(name, vaccine) {
-			return true
-		}
-	}
-	return false
 }
 
 func (p *PuntoMedico) ResultSendLastAt() time.Time {
@@ -99,7 +91,7 @@ func (p *PuntoMedico) ResultSentNow() {
 	p.resultSendLastAt = time.Now()
 }
 
-func (p *PuntoMedico) FormatMessage(result *Result) (string, error) {
+func (p *PuntoMedico) FormatMessage(result Terminsuchen) (string, error) {
 	t, err := template.New("message").Parse(tPunto)
 	if err != nil {
 		return "", err
