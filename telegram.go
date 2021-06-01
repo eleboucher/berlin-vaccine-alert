@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"errors"
 	"fmt"
 	"sync"
@@ -72,21 +71,6 @@ func (t *Telegram) SendMessageToAllUser(message string) error {
 	}()
 	wg.Wait()
 	return nil
-}
-
-func scanRows(rows *sql.Rows) ([]int64, error) {
-	entries := make([]int64, 0)
-
-	for rows.Next() {
-		var id int64
-		err := rows.Scan(&id)
-		if err != nil {
-			return nil, err
-		}
-		entries = append(entries, id)
-	}
-
-	return entries, nil
 }
 
 // HandleNewUsers handle the commands from telegrams
