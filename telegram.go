@@ -17,6 +17,7 @@ const (
 	filterButton     = "Add filters (multiple choices available)"
 	azButton         = "Look for AstraZeneca"
 	jjButton         = "Look for Johnson & Johnson"
+	biontechButton   = "Look for Biontech/Pfizer (not in vaccination centers)"
 	vcButton         = "Look For Vaccination Centers"
 	everythingButton = "Look for everything"
 	contributeButton = "Contribute"
@@ -41,6 +42,9 @@ var filtersKeyboard = tgbotapi.NewReplyKeyboard(
 	tgbotapi.NewKeyboardButtonRow(
 		tgbotapi.NewKeyboardButton(azButton),
 		tgbotapi.NewKeyboardButton(jjButton),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton(biontechButton),
 	),
 	tgbotapi.NewKeyboardButtonRow(
 		tgbotapi.NewKeyboardButton(vcButton),
@@ -182,6 +186,17 @@ func (t *Telegram) HandleNewUsers() error {
 				}
 			case vcButton:
 				_, err := t.chatModel.UpdateFilters(update.Message.Chat.ID, VaccinationCenter)
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
+				err = t.SendMessage("subscribed to Vaccination centers updates", update.Message.Chat.ID)
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
+			case biontechButton:
+				_, err := t.chatModel.UpdateFilters(update.Message.Chat.ID, Pfizer)
 				if err != nil {
 					fmt.Println(err)
 					return
