@@ -11,10 +11,5 @@ func NewDB() (*sql.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	statement, err := database.Prepare("CREATE TABLE IF NOT EXISTS chats (id INTEGER PRIMARY KEY)")
-	if err != nil {
-		return nil, err
-	}
-	statement.Exec()
 	return database, nil
 }
