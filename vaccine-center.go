@@ -83,20 +83,20 @@ func (v *VaccineCenter) Fetch() ([]*Result, error) {
 }
 
 // ShouldSendResult check if the result should be send now
-func (p *VaccineCenter) ShouldSendResult(result []*Result) bool {
-	if !reflect.DeepEqual(p.lastResult, result) {
+func (v *VaccineCenter) ShouldSendResult(result []*Result) bool {
+	if !reflect.DeepEqual(v.lastResult, result) {
 		return true
 	}
-	if p.resultSendLastAt.Before(time.Now().Add(-10 * time.Minute)) {
+	if v.resultSendLastAt.Before(time.Now().Add(-10 * time.Minute)) {
 		return true
 	}
 	return false
 }
 
 // ResultSentNow set that the appointment has been sent
-func (p *VaccineCenter) ResultSentNow(result []*Result) {
-	p.resultSendLastAt = time.Now()
-	p.lastResult = result
+func (v *VaccineCenter) ResultSentNow(result []*Result) {
+	v.resultSendLastAt = time.Now()
+	v.lastResult = result
 }
 
 func idToURL(id string) string {
