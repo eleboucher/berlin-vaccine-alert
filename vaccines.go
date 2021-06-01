@@ -6,14 +6,21 @@ import (
 )
 
 const (
-	AstraZeneca       = "astrazeneca"
+	// AstraZeneca is the name of the astrazeneca vaccine
+	AstraZeneca = "astrazeneca"
+	// JohnsonAndJohnson is the name for the JohnsonAndJohnson vaccine
 	JohnsonAndJohnson = "johnson"
-	Biontech          = "biontech"
-	Pfizer            = "pfizer"
-	Moderna           = "moderna"
+	// Biontech is the name for the biontech/pfizer vaccine
+	Biontech = "biontech"
+	// Pfizer is the other name for the biontech/pfizer vaccine
+	Pfizer = "pfizer"
+	// Moderna is the name for the Moderna vaccine
+	Moderna = "moderna"
+	// VaccinationCenter correspond to the vaccination center
 	VaccinationCenter = "vaccination_center"
 )
 
+// ErrVaccineNotFound is return when the vaccine can't be found
 var ErrVaccineNotFound = errors.New("vaccine not found")
 
 var vaccines = []string{

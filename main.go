@@ -10,12 +10,14 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
+// Result holds the information for a vaccine appointment
 type Result struct {
 	VaccineName string
 	Amount      int64
 	Message     string
 }
 
+// Fetcher is the type to allow fetching information for an appointment
 type Fetcher interface {
 	Fetch() ([]*Result, error)
 	ResultSendLastAt() time.Time

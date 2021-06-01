@@ -17,28 +17,33 @@ var centerURL = map[string]string{
 	"erika":     "https://www.doctolib.de/institut/berlin/ciz-berlin-berlin?pid=practice-158437",
 }
 
+// VMessage holds the information for the api response from impfstoff
 type VMessage struct {
 	Stats []StatElement `json:"stats"`
 }
 
+// StatElement holds the information for a specific vaccination center
 type StatElement struct {
-	ID         string               `json:"id"`
-	Name       string               `json:"name"`
-	Open       bool                 `json:"open"`
-	Stats      map[string]StatValue `json:"stats"`
-	LastUpdate *int64               `json:"lastUpdate,omitempty"`
+	ID   string `json:"id"`
+	Name string `json:"name"`
+	Open bool   `json:"open"`
+	// Stats      map[string]StatValue `json:"stats"`
+	LastUpdate *int64 `json:"lastUpdate,omitempty"`
 }
 
-type StatValue struct {
-	Percent float64 `json:"percent"`
-	Count   int64   `json:"count"`
-	Last    int64   `json:"last"`
-}
+// type StatValue struct {
+// 	Percent float64 `json:"percent"`
+// 	Count   int64   `json:"count"`
+// 	Last    int64   `json:"last"`
+// }
 
+// VaccineCenter holds the information for fetching the information for the
+// impfstoff.link/ website
 type VaccineCenter struct {
 	resultSendLastAt time.Time
 }
 
+// Fetch fetches all the appointments and filter then and return the results
 func (v *VaccineCenter) Fetch() ([]*Result, error) {
 	url := "https://api.impfstoff.link/?v=0.3"
 
@@ -73,10 +78,6 @@ func (v *VaccineCenter) Fetch() ([]*Result, error) {
 		}
 	}
 	return ret, nil
-}
-
-func (v *VaccineCenter) FormatMessage(result *Result) (string, error) {
-	return "", nil
 }
 
 func (v *VaccineCenter) ResultSendLastAt() time.Time {

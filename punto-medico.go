@@ -12,21 +12,26 @@ import (
 
 const tPunto = "{{.Nr}} appointments for {{.Name}} available https://punctum-medico.de/onlinetermine/"
 
+// PuntoMedico holds the information for fetching the information for the
+// punctum-medico.de website
 type PuntoMedico struct {
 	resultSendLastAt time.Time
 }
 
+// TMessage holds the information for the api response from punto medico
 type TMessage struct {
 	Terminsuchen          []Terminsuchen `json:"terminsuchen"`
 	Termine               [][]*string    `json:"termine"`
 	TermineProBezeichnung [][][]*string  `json:"termineProBezeichnung"`
 }
 
+// Terminsuchen holds the information of an appointment
 type Terminsuchen struct {
 	Name string `json:"name"`
 	Nr   int64  `json:"nr"`
 }
 
+// Fetch fetches all the available appointment and filter then and return the results
 func (p *PuntoMedico) Fetch() ([]*Result, error) {
 	url := "https://onlinetermine.zollsoft.de/includes/searchTermine_app_feature.php"
 
@@ -68,7 +73,7 @@ func (p *PuntoMedico) Fetch() ([]*Result, error) {
 		// Remove second dose vaccine for now
 		if !strings.Contains(a.Name, "Zweitimpfung") {
 			if vaccineName, err := getVaccineName(a.Name); err != nil {
-				message, err := p.FormatMessage(a)
+				message, err := p.formatMessage(a)
 				if err != nil {
 					return nil, err
 				}
@@ -91,7 +96,7 @@ func (p *PuntoMedico) ResultSentNow() {
 	p.resultSendLastAt = time.Now()
 }
 
-func (p *PuntoMedico) FormatMessage(result Terminsuchen) (string, error) {
+func (p *PuntoMedico) formatMessage(result Terminsuchen) (string, error) {
 	t, err := template.New("message").Parse(tPunto)
 	if err != nil {
 		return "", err
