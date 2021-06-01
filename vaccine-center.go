@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"reflect"
 	"time"
 )
 
@@ -41,6 +42,7 @@ type StatElement struct {
 // impfstoff.link/ website
 type VaccineCenter struct {
 	resultSendLastAt time.Time
+	lastResult       []*Result
 }
 
 // Fetch fetches all the appointments and filter then and return the results
@@ -80,12 +82,21 @@ func (v *VaccineCenter) Fetch() ([]*Result, error) {
 	return ret, nil
 }
 
-func (v *VaccineCenter) ResultSendLastAt() time.Time {
-	return v.resultSendLastAt
+// ShouldSendResult check if the result should be send now
+func (p *VaccineCenter) ShouldSendResult(result []*Result) bool {
+	if !reflect.DeepEqual(p.lastResult, result) {
+		return true
+	}
+	if p.resultSendLastAt.Before(time.Now().Add(-10 * time.Minute)) {
+		return true
+	}
+	return false
 }
 
-func (v *VaccineCenter) ResultSentNow() {
-	v.resultSendLastAt = time.Now()
+// ResultSentNow set that the appointment has been sent
+func (p *VaccineCenter) ResultSentNow(result []*Result) {
+	p.resultSendLastAt = time.Now()
+	p.lastResult = result
 }
 
 func idToURL(id string) string {

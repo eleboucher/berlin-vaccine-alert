@@ -20,8 +20,8 @@ type Result struct {
 // Fetcher is the type to allow fetching information for an appointment
 type Fetcher interface {
 	Fetch() ([]*Result, error)
-	ResultSendLastAt() time.Time
-	ResultSentNow()
+	ShouldSendResult(result []*Result) bool
+	ResultSentNow(result []*Result)
 }
 
 func fetchAllAppointment(fetchers []Fetcher, bot *Telegram) {
@@ -38,8 +38,8 @@ func fetchAllAppointment(fetchers []Fetcher, bot *Telegram) {
 				return
 			}
 			fmt.Printf("Received %d result\n", len(res))
-			if len(res) > 0 && fetcher.ResultSendLastAt().Before(time.Now().Add(-1*time.Minute)) {
-				fetcher.ResultSentNow()
+			if len(res) > 0 && fetcher.ShouldSendResult(res) {
+				fetcher.ResultSentNow(res)
 				for _, r := range res {
 
 					bot.SendMessageToAllUser(r.Message)

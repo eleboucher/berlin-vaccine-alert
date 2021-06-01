@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"reflect"
 	"strings"
 	"text/template"
 	"time"
@@ -16,6 +17,7 @@ const tPunto = "{{.Nr}} appointments for {{.Name}} available https://punctum-med
 // punctum-medico.de website
 type PuntoMedico struct {
 	resultSendLastAt time.Time
+	lastResult       []*Result
 }
 
 // TMessage holds the information for the api response from punto medico
@@ -71,29 +73,38 @@ func (p *PuntoMedico) Fetch() ([]*Result, error) {
 
 	for _, a := range resp.Terminsuchen {
 		// Remove second dose vaccine for now
-		if !strings.Contains(a.Name, "Zweitimpfung") {
-			if vaccineName, err := getVaccineName(a.Name); err != nil {
-				message, err := p.formatMessage(a)
-				if err != nil {
-					return nil, err
-				}
-				ret = append(ret, &Result{
-					VaccineName: vaccineName,
-					Amount:      a.Nr,
-					Message:     message,
-				})
+		// if !strings.Contains(a.Name, "Zweitimpfung") {
+		if vaccineName, err := getVaccineName(a.Name); err != nil {
+			message, err := p.formatMessage(a)
+			if err != nil {
+				return nil, err
 			}
+			ret = append(ret, &Result{
+				VaccineName: vaccineName,
+				Amount:      a.Nr,
+				Message:     message,
+			})
 		}
+		// }
 	}
 	return ret, nil
 }
 
-func (p *PuntoMedico) ResultSendLastAt() time.Time {
-	return p.resultSendLastAt
+// ShouldSendResult check if the result should be send now
+func (p *PuntoMedico) ShouldSendResult(result []*Result) bool {
+	if !reflect.DeepEqual(p.lastResult, result) {
+		return true
+	}
+	if p.resultSendLastAt.Before(time.Now().Add(-10 * time.Minute)) {
+		return true
+	}
+	return false
 }
 
-func (p *PuntoMedico) ResultSentNow() {
+// ResultSentNow set that the appointment has been sent
+func (p *PuntoMedico) ResultSentNow(result []*Result) {
 	p.resultSendLastAt = time.Now()
+	p.lastResult = result
 }
 
 func (p *PuntoMedico) formatMessage(result Terminsuchen) (string, error) {
