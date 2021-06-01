@@ -74,7 +74,7 @@ func (p *PuntoMedico) Fetch() ([]*Result, error) {
 	for _, a := range resp.Terminsuchen {
 		// Remove second dose vaccine for now
 		if !strings.Contains(a.Name, "Zweitimpfung") {
-			if vaccineName, err := getVaccineName(a.Name); err != nil {
+			if vaccineName, err := getVaccineName(a.Name); err == nil {
 				message, err := p.formatMessage(a)
 				if err != nil {
 					return nil, err
@@ -84,6 +84,7 @@ func (p *PuntoMedico) Fetch() ([]*Result, error) {
 					Amount:      a.Nr,
 					Message:     message,
 				})
+
 			}
 		}
 	}
