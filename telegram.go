@@ -274,7 +274,22 @@ func (t *Telegram) startChat(chatID int64) error {
 			if err != nil {
 				return err
 			}
-			err = t.SendMessage("Hey Again! You are already added to the subscription list, you will receive appointments shortly when they will be available", chatID)
+			err = t.SendMessage(`
+Hey Again!
+You are already added to the subscription list, you will receive appointments shortly when they will be available!
+
+I hope this bot helps you in your research to get the vaccine!
+
+Provide feedback 📢 on Reddit: https://www.reddit.com/r/berlinvaccination/comments/np81h5/telegram_bot_to_get_a_vaccine_appointment/
+
+Feel free to help me with the cost or with the code, via:
+💸 Donate via PayPal: https://paypal.me/ELeboucher
+🍻 Buy me a beer: https://www.buymeacoffee.com/eleboucher
+🧑‍💻 Contribute to the code:  https://github.com/eleboucher/berlin-vaccine-alert
+
+I really hope it can help you to find your appointment!
+
+Stay Safe, and thanks for your support! ❤️`, chatID)
 			if err != nil {
 				return err
 			}
@@ -282,7 +297,21 @@ func (t *Telegram) startChat(chatID int64) error {
 		}
 		return err
 	}
-	err = t.SendMessage("Welcome 👋🏼! You are now added to the subscription list, you will receive appointments shortly when they will be available", chatID)
+	err = t.SendMessage(`
+Welcome 👋🏼!
+You are now added to the subscription list, you will receive appointments shortly when they will be available
+I hope this bot helps you in your research to get the vaccine!
+
+Provide feedback 📢 on Reddit: https://www.reddit.com/r/berlinvaccination/comments/np81h5/telegram_bot_to_get_a_vaccine_appointment/
+
+Feel free to help me with the cost of the bot or with the code, via:
+💸 Donate via PayPal: https://paypal.me/ELeboucher
+🍻 Buy me a beer: https://www.buymeacoffee.com/eleboucher
+🧑‍💻 Contribute to the code:  https://github.com/eleboucher/berlin-vaccine-alert
+
+I really hope it can help you to find your appointment!
+
+Stay Safe, and thanks for your support! ❤️`, chatID)
 	if err != nil {
 		return err
 	}
@@ -296,7 +325,21 @@ func (t *Telegram) stopChat(chatID int64) error {
 	if err != nil {
 		return err
 	}
-	err = t.SendMessage("Removed from the list successfully. if you want to receive messages again type /start", chatID)
+	err = t.SendMessage(`
+Hey!
+
+You are removed from the list. If you want to receive messages again type /start.
+
+I hope you had book an appointment and you are getting vaccinated soon!
+
+If you have any feedback feel free to post something on Reddit: https://www.reddit.com/r/berlinvaccination/comments/np81h5/telegram_bot_to_get_a_vaccine_appointment/
+
+Feel free to help me with the cost of the bot or with the code, via:
+💸 Donate via PayPal: https://paypal.me/ELeboucher
+🍻 Buy me a beer: https://www.buymeacoffee.com/eleboucher
+🧑‍💻 Contribute to the code:  https://github.com/eleboucher/berlin-vaccine-alert
+
+Stay Safe, and thanks for your support! ❤️`, chatID)
 	if err != nil {
 		return err
 	}
