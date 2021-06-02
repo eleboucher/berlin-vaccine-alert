@@ -72,7 +72,6 @@ func NewBot(bot *tgbotapi.BotAPI, chatModel *chat.Model) *Telegram {
 
 // SendMessage send a message in string to a channel id
 func (t *Telegram) SendMessage(message string, channel int64) error {
-	fmt.Printf("sending message %s on channel %d", message, channel)
 	msg := tgbotapi.MessageConfig{
 		BaseChat: tgbotapi.BaseChat{
 			ChatID:           channel,
@@ -100,6 +99,8 @@ func (t *Telegram) SendMessageToAllUser(result *Result) error {
 	if err != nil {
 		return err
 	}
+
+	fmt.Printf("sending message %s for %d\n", result.Message, len(chats))
 
 	for _, chat := range chats {
 		chat := chat
