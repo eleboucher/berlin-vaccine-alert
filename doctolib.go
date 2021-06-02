@@ -31,6 +31,7 @@ type Doctolib struct {
 	VaccineName      string
 	URL              string
 	Detail           string
+	Delay            time.Duration
 	Limit            string `url:"limit"`
 	PraticeID        string `url:"pratice_ids"`
 	AgendaID         string `url:"agenda_ids"`
@@ -137,10 +138,13 @@ func (d *Doctolib) formatMessage(result Result) (string, error) {
 
 // ShouldSendResult check if the result should be send now
 func (d *Doctolib) ShouldSendResult(result []*Result) bool {
-	if !reflect.DeepEqual(d.lastResult, result) && d.resultSendLastAt.Before(time.Now().Add(-1*time.Minute)) {
+	if d.Delay == 0 {
+		d.Delay = 1
+	}
+	if !reflect.DeepEqual(d.lastResult, result) && d.resultSendLastAt.Before(time.Now().Add(-d.Delay*1*time.Minute)) {
 		return true
 	}
-	if d.resultSendLastAt.Before(time.Now().Add(-10 * time.Minute)) {
+	if d.resultSendLastAt.Before(time.Now().Add(-d.Delay + 10*time.Minute)) {
 		return true
 	}
 	return false
