@@ -94,9 +94,9 @@ func main() {
 	telegram := NewBot(bot, chatModel)
 
 	sources := []Fetcher{
-		// &PuntoMedico{},
-		// &VaccineCenter{},
-		// &MedicoLeopoldPlatz{},
+		&PuntoMedico{},
+		&VaccineCenter{},
+		&MedicoLeopoldPlatz{},
 		&Doctolib{
 			URL:           "https://www.doctolib.de/praxis/brandenburg-an-der-havel/corona-schutzimpfung-gzb",
 			VaccineName:   JohnsonAndJohnson,
