@@ -94,9 +94,23 @@ func main() {
 	telegram := NewBot(bot, chatModel)
 
 	sources := []Fetcher{
-		&PuntoMedico{},
-		&VaccineCenter{},
-		&MedicoLeopoldPlatz{},
+		// &PuntoMedico{},
+		// &VaccineCenter{},
+		// &MedicoLeopoldPlatz{},
+		&Doctolib{
+			URL:           "https://www.doctolib.de/praxis/brandenburg-an-der-havel/corona-schutzimpfung-gzb",
+			VaccineName:   JohnsonAndJohnson,
+			PraticeID:     "186461",
+			AgendaID:      "472530",
+			VisitMotiveID: "2877045",
+		},
+		&Doctolib{
+			URL:           "https://www.doctolib.de/praxis/brandenburg-an-der-havel/corona-schutzimpfung-gzb",
+			VaccineName:   AstraZeneca,
+			PraticeID:     "186461",
+			AgendaID:      "472530",
+			VisitMotiveID: "2741487",
+		},
 	}
 
 	var wg sync.WaitGroup
