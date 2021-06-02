@@ -84,6 +84,12 @@ func (t *Telegram) SendMessage(message string, channel int64) error {
 	}
 	_, err := t.bot.Send(msg)
 	if err != nil {
+		if err.Error() == "Forbidden: bot was blocked by the user" || err.Error() == "Forbidden: user is deactivated" {
+			_, err := t.chatModel.Delete(channel)
+			if err != nil {
+				return err
+			}
+		}
 		return err
 	}
 	return nil
