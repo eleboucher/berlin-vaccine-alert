@@ -93,7 +93,7 @@ func (p *PuntoMedico) Fetch() ([]*Result, error) {
 
 // ShouldSendResult check if the result should be send now
 func (p *PuntoMedico) ShouldSendResult(result []*Result) bool {
-	if !reflect.DeepEqual(p.lastResult, result) {
+	if !reflect.DeepEqual(p.lastResult, result) && p.resultSendLastAt.Before(time.Now().Add(-1*time.Minute)) {
 		return true
 	}
 	if p.resultSendLastAt.Before(time.Now().Add(-10 * time.Minute)) {

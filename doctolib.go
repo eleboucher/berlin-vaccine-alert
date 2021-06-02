@@ -134,7 +134,7 @@ func (d *Doctolib) formatMessage(result Result) (string, error) {
 
 // ShouldSendResult check if the result should be send now
 func (d *Doctolib) ShouldSendResult(result []*Result) bool {
-	if !reflect.DeepEqual(d.lastResult, result) {
+	if !reflect.DeepEqual(d.lastResult, result) && d.resultSendLastAt.Before(time.Now().Add(-1*time.Minute)) {
 		return true
 	}
 	if d.resultSendLastAt.Before(time.Now().Add(-10 * time.Minute)) {

@@ -96,7 +96,7 @@ func (m *MedicoLeopoldPlatz) formatMessage(result resultMedicoLeopoldPlatz) (str
 
 // ShouldSendResult check if the result should be send now
 func (m *MedicoLeopoldPlatz) ShouldSendResult(result []*Result) bool {
-	if !reflect.DeepEqual(m.lastResult, result) {
+	if !reflect.DeepEqual(m.lastResult, result) && m.resultSendLastAt.Before(time.Now().Add(-1*time.Minute)) {
 		return true
 	}
 	if m.resultSendLastAt.Before(time.Now().Add(-10 * time.Minute)) {

@@ -84,7 +84,7 @@ func (v *VaccineCenter) Fetch() ([]*Result, error) {
 
 // ShouldSendResult check if the result should be send now
 func (v *VaccineCenter) ShouldSendResult(result []*Result) bool {
-	if !reflect.DeepEqual(v.lastResult, result) {
+	if !reflect.DeepEqual(v.lastResult, result) && v.resultSendLastAt.Before(time.Now().Add(-1*time.Minute)) {
 		return true
 	}
 	if v.resultSendLastAt.Before(time.Now().Add(-10 * time.Minute)) {
