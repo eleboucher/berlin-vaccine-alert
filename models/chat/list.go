@@ -5,13 +5,15 @@ import (
 )
 
 // List lists chats
-func (m *Model) List(vaccineName string) ([]*Chat, error) {
+func (m *Model) List(vaccineName *string) ([]*Chat, error) {
 	q := m.getSelectBuilder().Where(
-		sq.Eq{"enabled": true}).
-		Where(
-			sq.Or{sq.Like{"filters": "%" + vaccineName + "%"}, sq.Eq{"filters": nil}},
-		)
+		sq.Eq{"enabled": true})
 
+	if vaccineName != nil {
+		q.Where(
+			sq.Or{sq.Like{"filters": "%" + *vaccineName + "%"}, sq.Eq{"filters": nil}},
+		)
+	}
 	rows, err := q.Query()
 	if err != nil {
 		return nil, err

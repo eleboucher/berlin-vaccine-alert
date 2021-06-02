@@ -97,7 +97,7 @@ func (t *Telegram) SendMessage(message string, channel int64) error {
 
 // SendMessageToAllUser send a message to all the enabled users
 func (t *Telegram) SendMessageToAllUser(result *vaccines.Result) error {
-	chats, err := t.chatModel.List(result.VaccineName)
+	chats, err := t.chatModel.List(&result.VaccineName)
 	if err != nil {
 		return err
 	}
