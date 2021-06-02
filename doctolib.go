@@ -144,7 +144,7 @@ func (d *Doctolib) ShouldSendResult(result []*Result) bool {
 	if !reflect.DeepEqual(d.lastResult, result) && d.resultSendLastAt.Before(time.Now().Add(-d.Delay*1*time.Minute)) {
 		return true
 	}
-	if d.resultSendLastAt.Before(time.Now().Add(-d.Delay + 10*time.Minute)) {
+	if d.resultSendLastAt.Before(time.Now().Add(d.Delay - 10*time.Minute)) {
 		return true
 	}
 	return false
