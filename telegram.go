@@ -7,6 +7,7 @@ import (
 
 	"github.com/eleboucher/covid/models/chat"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -100,18 +101,20 @@ func (t *Telegram) SendMessageToAllUser(result *Result) error {
 		return err
 	}
 
-	fmt.Printf("sending message %s for %d users\n", result.Message, len(chats))
+	log.Infof("sending message %s for %d users\n", result.Message, len(chats))
 
 	for _, chat := range chats {
 		chat := chat
 		err := t.SendMessage(result.Message, chat.ID)
 		if err != nil {
-			fmt.Println(err)
+			log.Error(err)
+			continue
 		}
 	}
 	err = t.SendMessage(result.Message, viper.GetInt64("telegram-channel"))
 	if err != nil {
-		fmt.Println(err)
+		log.Error(err)
+		return err
 	}
 	return nil
 }
@@ -144,7 +147,7 @@ func (t *Telegram) HandleNewUsers() error {
 			case contributeButton:
 				err = t.SendMessage("Hey you 🚀,\nThanks a lot for using the bot,\n\n\nFeel free to contribute on Github: https://github.com/eleboucher/berlin-vaccine-alert\n\n\nOr feel free to contribute on Paypal https://paypal.me/ELeboucher or Buy me a beer https://www.buymeacoffee.com/eleboucher", update.Message.Chat.ID)
 				if err != nil {
-					fmt.Println(err)
+					log.Error(err)
 				}
 			case filterButton:
 				msg.ReplyMarkup = filtersKeyboard
@@ -152,72 +155,72 @@ func (t *Telegram) HandleNewUsers() error {
 			case stopButton:
 				err := t.stopChat(update.Message.Chat.ID)
 				if err != nil {
-					fmt.Println(err)
+					log.Error(err)
 				}
 			case startButton:
 				err := t.startChat(update.Message.Chat.ID)
 				if err != nil {
-					fmt.Println(err)
+					log.Error(err)
 				}
 			case azButton:
 				_, err := t.chatModel.UpdateFilters(update.Message.Chat.ID, AstraZeneca)
 				if err != nil {
-					fmt.Println(err)
+					log.Error(err)
 					return
 				}
 				err = t.SendMessage("subscribed to AstraZeneca updates", update.Message.Chat.ID)
 				if err != nil {
-					fmt.Println(err)
+					log.Error(err)
 					return
 				}
 			case jjButton:
 				_, err := t.chatModel.UpdateFilters(update.Message.Chat.ID, JohnsonAndJohnson)
 				if err != nil {
-					fmt.Println(err)
+					log.Error(err)
 					return
 				}
 				err = t.SendMessage("subscribed to Johnson And Johnson updates", update.Message.Chat.ID)
 				if err != nil {
-					fmt.Println(err)
+					log.Error(err)
 					return
 				}
 			case vcButton:
 				_, err := t.chatModel.UpdateFilters(update.Message.Chat.ID, VaccinationCenter)
 				if err != nil {
-					fmt.Println(err)
+					log.Error(err)
 					return
 				}
 				err = t.SendMessage("subscribed to Vaccination centers updates", update.Message.Chat.ID)
 				if err != nil {
-					fmt.Println(err)
+					log.Error(err)
 					return
 				}
 			case biontechButton:
 				_, err := t.chatModel.UpdateFilters(update.Message.Chat.ID, Pfizer)
 				if err != nil {
-					fmt.Println(err)
+					log.Error(err)
 					return
 				}
 				err = t.SendMessage("subscribed to Biontech/Pfizer updates", update.Message.Chat.ID)
 				if err != nil {
-					fmt.Println(err)
+					log.Error(err)
 					return
 				}
 			case everythingButton:
 				_, err := t.chatModel.UpdateFilters(update.Message.Chat.ID, "")
 				if err != nil {
-					fmt.Println(err)
+					log.Error(err)
 					return
 				}
 				err = t.SendMessage("subscribed to every updates", update.Message.Chat.ID)
 				if err != nil {
-					fmt.Println(err)
+					log.Error(err)
 					return
 				}
 			case infoFilterButton:
 				chat, err := t.chatModel.Find(update.Message.Chat.ID)
 				if err != nil {
-					fmt.Println(err)
+					log.Error(err)
 					return
 				}
 				var filters string
@@ -229,7 +232,7 @@ func (t *Telegram) HandleNewUsers() error {
 				msg := fmt.Sprintf("your current filters are :\n%s\n\nSelect %s to reset them", filters, everythingButton)
 				err = t.SendMessage(msg, update.Message.Chat.ID)
 				if err != nil {
-					fmt.Println(err)
+					log.Error(err)
 					return
 				}
 			}
@@ -238,12 +241,12 @@ func (t *Telegram) HandleNewUsers() error {
 			case "start":
 				err := t.startChat(update.Message.Chat.ID)
 				if err != nil {
-					fmt.Println(err)
+					log.Error(err)
 				}
 			case "stop":
 				err := t.stopChat(update.Message.Chat.ID)
 				if err != nil {
-					fmt.Println(err)
+					log.Error(err)
 				}
 			case "open":
 				msg.ReplyMarkup = filtersKeyboard
@@ -251,17 +254,17 @@ func (t *Telegram) HandleNewUsers() error {
 			case "contribute":
 				err = t.SendMessage("Hey you 🚀,\nThanks a lot for using the bot,\n\n\nFeel free to contribute on Github: https://github.com/eleboucher/berlin-vaccine-alert\n\n\nOr feel free to contribute on Paypal https://paypal.me/ELeboucher or Buy me a beer https://www.buymeacoffee.com/eleboucher", update.Message.Chat.ID)
 				if err != nil {
-					fmt.Println(err)
+					log.Error(err)
 				}
 			}
 		}()
 	}
-	fmt.Println("done with telegram handler")
+	log.Info("done with telegram handler")
 	return nil
 }
 
 func (t *Telegram) startChat(chatID int64) error {
-	fmt.Printf("adding chat %d\n", chatID)
+	log.Infof("adding chat %d\n", chatID)
 
 	_, err := t.chatModel.Create(chatID)
 	if err != nil {
@@ -276,7 +279,6 @@ func (t *Telegram) startChat(chatID int64) error {
 			}
 			return err
 		}
-		fmt.Println(err)
 		return err
 	}
 	err = t.SendMessage("Welcome 👋🏼! You are now added to the subscription list, you will receive appointments shortly when they will be available", chatID)
@@ -287,7 +289,7 @@ func (t *Telegram) startChat(chatID int64) error {
 }
 
 func (t *Telegram) stopChat(chatID int64) error {
-	fmt.Printf("removing chat %d\n", chatID)
+	log.Infof("removing chat %d\n", chatID)
 
 	_, err := t.chatModel.Delete(chatID)
 	if err != nil {

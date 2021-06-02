@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"net/http"
 	"reflect"
 	"regexp"
@@ -40,7 +39,6 @@ func (m *MedicoLeopoldPlatz) Fetch() ([]*Result, error) {
 	defer res.Body.Close()
 	doc, err := goquery.NewDocumentFromReader(res.Body)
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 

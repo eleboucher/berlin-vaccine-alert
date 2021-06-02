@@ -2,14 +2,28 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"sync"
 	"time"
 
 	"github.com/eleboucher/covid/models/chat"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
+
+func init() {
+	// Log as JSON instead of the default ASCII formatter.
+	log.SetFormatter(&log.JSONFormatter{})
+
+	// Output to stdout instead of the default stderr
+	// Can be any io.Writer, see below for File example
+	log.SetOutput(os.Stdout)
+
+	// Only log the warning severity or above.
+	log.SetLevel(log.WarnLevel)
+}
 
 // Result holds the information for a vaccine appointment
 type Result struct {
@@ -32,13 +46,13 @@ func fetchAllAppointment(fetchers []Fetcher, bot *Telegram) {
 	for _, fetcher := range fetchers {
 		fetcher := fetcher
 		go func() {
-			fmt.Println("Starting fetch")
+			log.Info("Starting fetch")
 			res, err := fetcher.Fetch()
 			if err != nil {
 				errChan <- err
 				return
 			}
-			fmt.Printf("Received %d result\n", len(res))
+			log.Infof("Received %d result\n", len(res))
 			if len(res) > 0 && fetcher.ShouldSendResult(res) {
 				fetcher.ResultSentNow(res)
 				for _, r := range res {
@@ -49,7 +63,7 @@ func fetchAllAppointment(fetchers []Fetcher, bot *Telegram) {
 						return
 					}
 				}
-				fmt.Println("messages sent on telegram")
+				log.Info("messages sent on telegram")
 			}
 			done <- true
 		}()
@@ -59,11 +73,11 @@ func fetchAllAppointment(fetchers []Fetcher, bot *Telegram) {
 	for {
 		select {
 		case <-done:
-			fmt.Println("fetch done")
+			log.Info("fetch done")
 		case <-timeout:
 			return
 		case err := <-errChan:
-			fmt.Printf("%v\n", err)
+			log.Errorf("%v\n", err)
 
 		}
 	}
@@ -82,12 +96,12 @@ func init() {
 func main() {
 	db, err := NewDB()
 	if err != nil {
-		fmt.Println(err)
+		log.Error(err)
 		return
 	}
 	bot, err := tgbotapi.NewBotAPI(viper.GetString("telegram-token"))
 	if err != nil {
-		fmt.Println(err)
+		log.Error(err)
 		return
 	}
 	chatModel := chat.NewModel(db)
@@ -225,7 +239,7 @@ func main() {
 		defer wg.Done()
 		err := telegram.HandleNewUsers()
 		if err != nil {
-			fmt.Println(err)
+			log.Error(err)
 			return
 		}
 	}()
