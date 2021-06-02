@@ -29,6 +29,11 @@ type MedicoLeopoldPlatz struct {
 	lastResult       []*vaccines.Result
 }
 
+// Name return the name of the source
+func (m *MedicoLeopoldPlatz) Name() string {
+	return "Medico LeopoldPlatz"
+}
+
 // Fetch fetches all the available appointment and filter then and return the results
 func (m *MedicoLeopoldPlatz) Fetch() ([]*vaccines.Result, error) {
 	var ret []*vaccines.Result

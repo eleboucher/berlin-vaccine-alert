@@ -42,6 +42,11 @@ type Doctolib struct {
 	lastResult       []*vaccines.Result
 }
 
+// Name return the name of the source
+func (d *Doctolib) Name() string {
+	return "Doctolib " + d.URL
+}
+
 // Fetch fetches all the available appointment and filter then and return the results
 func (d *Doctolib) Fetch() ([]*vaccines.Result, error) {
 	url := "https://www.doctolib.de/availabilities.json"

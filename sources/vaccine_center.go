@@ -47,6 +47,11 @@ type VaccineCenter struct {
 	lastResult       []*vaccines.Result
 }
 
+// Name return the name of the source
+func (v *VaccineCenter) Name() string {
+	return "Vaccine Center"
+}
+
 // Fetch fetches all the appointments and filter then and return the results
 func (v *VaccineCenter) Fetch() ([]*vaccines.Result, error) {
 	url := "https://api.impfstoff.link/?v=0.3"

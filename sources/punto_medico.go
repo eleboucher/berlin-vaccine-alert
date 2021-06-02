@@ -35,6 +35,11 @@ type Terminsuchen struct {
 	Nr   int64  `json:"nr"`
 }
 
+// Name return the name of the source
+func (p *PuntoMedico) Name() string {
+	return "Punto Medico"
+}
+
 // Fetch fetches all the available appointment and filter then and return the results
 func (p *PuntoMedico) Fetch() ([]*vaccines.Result, error) {
 	url := "https://onlinetermine.zollsoft.de/includes/searchTermine_app_feature.php"

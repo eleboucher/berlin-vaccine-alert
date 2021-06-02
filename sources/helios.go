@@ -61,6 +61,11 @@ type Helios struct {
 
 const tHelios = "appointments for biontech available call https://patienten.helios-gesundheit.de/appointments/book-appointment?facility=10&physician=21646&purpose=33239&resource=58"
 
+// Name return the name of the source
+func (h *Helios) Name() string {
+	return "Helios"
+}
+
 // Fetch fetches all the available appointment and filter then and return the results
 func (h *Helios) Fetch() ([]*vaccines.Result, error) {
 	url := "https://api.patienten.helios-gesundheit.de/api/appointment/resources/21646/purposes?insuranceTypeId=1&specialtyUUID=c619bfb1-9e18-404d-b960-dfac6c072490"

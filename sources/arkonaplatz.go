@@ -37,6 +37,11 @@ type ARequest struct {
 	EndDate     string `json:"endDate"`
 }
 
+// Name return the name of the source
+func (a *ArkonoPlatz) Name() string {
+	return "ArkonoPlatz"
+}
+
 // Fetch fetches all the available appointment and filter then and return the results
 func (a *ArkonoPlatz) Fetch() ([]*vaccines.Result, error) {
 	url := "https://praxis-arkonaplatz.termin-direkt.de/rest-v2/api/Calendars/2/DaysWithFreeIntervals"

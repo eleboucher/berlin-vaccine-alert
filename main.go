@@ -18,6 +18,7 @@ import (
 
 // Fetcher is the type to allow fetching information for an appointment
 type Fetcher interface {
+	Name() string
 	Fetch() ([]*vaccines.Result, error)
 	ShouldSendResult(result []*vaccines.Result) bool
 	ResultSentNow(result []*vaccines.Result)
@@ -170,13 +171,13 @@ func fetchAllAppointment(fetchers []Fetcher, bot *Telegram) {
 	for _, fetcher := range fetchers {
 		fetcher := fetcher
 		go func() {
-			log.Info("Starting fetch")
+			log.Infof("%s: Starting fetch", fetcher.Name())
 			res, err := fetcher.Fetch()
 			if err != nil {
 				errChan <- err
 				return
 			}
-			log.Infof("Received %d result\n", len(res))
+			log.Infof("%s:Received %d result\n", fetcher.Name(), len(res))
 			if len(res) > 0 && fetcher.ShouldSendResult(res) {
 				fetcher.ResultSentNow(res)
 				for _, r := range res {
@@ -187,7 +188,7 @@ func fetchAllAppointment(fetchers []Fetcher, bot *Telegram) {
 						return
 					}
 				}
-				log.Info("messages sent on telegram")
+				log.Infof("%s: messages sent on telegram", fetcher.Name())
 			}
 			done <- true
 		}()
@@ -197,7 +198,7 @@ func fetchAllAppointment(fetchers []Fetcher, bot *Telegram) {
 	for {
 		select {
 		case <-done:
-			log.Info("fetch done")
+			continue
 		case <-timeout:
 			return
 		case err := <-errChan:
