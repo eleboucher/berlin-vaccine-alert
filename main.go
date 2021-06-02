@@ -177,7 +177,7 @@ func fetchAllAppointment(fetchers []Fetcher, bot *Telegram) {
 				errChan <- err
 				return
 			}
-			log.Infof("%s:Received %d result\n", fetcher.Name(), len(res))
+			log.Infof("%s: Received %d result", fetcher.Name(), len(res))
 			if len(res) > 0 && fetcher.ShouldSendResult(res) {
 				fetcher.ResultSentNow(res)
 				for _, r := range res {
