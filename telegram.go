@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-	"sync"
 
 	"github.com/eleboucher/covid/models/chat"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
@@ -101,27 +100,18 @@ func (t *Telegram) SendMessageToAllUser(result *Result) error {
 	if err != nil {
 		return err
 	}
-	var wg sync.WaitGroup
-	wg.Add(len(chats) + 1)
 
 	for _, chat := range chats {
 		chat := chat
-		go func() {
-			defer wg.Done()
-			err := t.SendMessage(result.Message, chat.ID)
-			if err != nil {
-				fmt.Println(err)
-			}
-		}()
-	}
-	go func() {
-		wg.Done()
-		err := t.SendMessage(result.Message, viper.GetInt64("telegram-channel"))
+		err := t.SendMessage(result.Message, chat.ID)
 		if err != nil {
 			fmt.Println(err)
 		}
-	}()
-	wg.Wait()
+	}
+	err = t.SendMessage(result.Message, viper.GetInt64("telegram-channel"))
+	if err != nil {
+		fmt.Println(err)
+	}
 	return nil
 }
 
