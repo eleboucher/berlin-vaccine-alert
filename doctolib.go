@@ -12,7 +12,7 @@ import (
 	"github.com/google/go-querystring/query"
 )
 
-const tDoctolib = "{{.Amount}} appointments for {{.VaccineName}} available {{.URL}}"
+const tDoctolib = "{{.Amount}} appointments for {{.VaccineName}} {{.Detail}} available {{.URL}}"
 
 type ResultDoctolib struct {
 	Availabilities []*Availability `json:"availabilities,omitempty"`
@@ -30,6 +30,7 @@ type Availability struct {
 type Doctolib struct {
 	VaccineName      string
 	URL              string
+	Detail           string
 	Limit            string `url:"limit"`
 	PraticeID        string `url:"pratice_ids"`
 	AgendaID         string `url:"agenda_ids"`
@@ -114,9 +115,11 @@ func (d *Doctolib) formatMessage(result Result) (string, error) {
 		URL         string
 		VaccineName string
 		Amount      int64
+		Detail      string
 	}{
 		URL:         d.URL,
 		VaccineName: d.VaccineName,
+		Detail:      d.Detail,
 		Amount:      result.Amount,
 	}
 

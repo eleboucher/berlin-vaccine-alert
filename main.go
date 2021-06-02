@@ -103,6 +103,7 @@ func main() {
 			PraticeID:     "186461",
 			AgendaID:      "472530",
 			VisitMotiveID: "2877045",
+			Detail:        "(for 40+)",
 		},
 		&Doctolib{
 			URL:           "https://www.doctolib.de/praxis/brandenburg-an-der-havel/corona-schutzimpfung-gzb",
@@ -110,6 +111,7 @@ func main() {
 			PraticeID:     "186461",
 			AgendaID:      "472530",
 			VisitMotiveID: "2741487",
+			Detail:        "(for 40+)",
 		},
 	}
 
