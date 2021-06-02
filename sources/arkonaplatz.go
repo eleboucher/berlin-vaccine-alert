@@ -1,4 +1,4 @@
-package main
+package sources
 
 import (
 	"bytes"
@@ -9,6 +9,8 @@ import (
 	"strings"
 	"text/template"
 	"time"
+
+	"github.com/eleboucher/covid/vaccines"
 )
 
 const tArkonoPlatz = "Appointments for {{.VaccineName}} available https://praxis-arkonaplatz.termin-direkt.de/public/book"
@@ -17,7 +19,7 @@ const tArkonoPlatz = "Appointments for {{.VaccineName}} available https://praxis
 // https://medico-leopoldplatz.de/ website
 type ArkonoPlatz struct {
 	resultSendLastAt time.Time
-	lastResult       []*Result
+	lastResult       []*vaccines.Result
 }
 
 type AResponse struct {
@@ -36,7 +38,7 @@ type ARequest struct {
 }
 
 // Fetch fetches all the available appointment and filter then and return the results
-func (a *ArkonoPlatz) Fetch() ([]*Result, error) {
+func (a *ArkonoPlatz) Fetch() ([]*vaccines.Result, error) {
 	url := "https://praxis-arkonaplatz.termin-direkt.de/rest-v2/api/Calendars/2/DaysWithFreeIntervals"
 
 	reqPayload := ARequest{
@@ -74,18 +76,18 @@ func (a *ArkonoPlatz) Fetch() ([]*Result, error) {
 		return nil, nil
 	}
 
-	var ret Result
-	ret.VaccineName = AstraZeneca
+	var ret vaccines.Result
+	ret.VaccineName = vaccines.AstraZeneca
 	message, err := a.formatMessage(ret)
 	if err != nil {
 		return nil, err
 	}
 	ret.Message = message
 
-	return []*Result{&ret}, nil
+	return []*vaccines.Result{&ret}, nil
 }
 
-func (a *ArkonoPlatz) formatMessage(result Result) (string, error) {
+func (a *ArkonoPlatz) formatMessage(result vaccines.Result) (string, error) {
 	t, err := template.New("message").Parse(tArkonoPlatz)
 	if err != nil {
 		return "", err
@@ -99,7 +101,7 @@ func (a *ArkonoPlatz) formatMessage(result Result) (string, error) {
 }
 
 // ShouldSendResult check if the result should be send now
-func (a *ArkonoPlatz) ShouldSendResult(result []*Result) bool {
+func (a *ArkonoPlatz) ShouldSendResult(result []*vaccines.Result) bool {
 	if !reflect.DeepEqual(a.lastResult, result) && a.resultSendLastAt.Before(time.Now().Add(-1*time.Minute)) {
 		return true
 	}
@@ -110,7 +112,7 @@ func (a *ArkonoPlatz) ShouldSendResult(result []*Result) bool {
 }
 
 // ResultSentNow set that the appointment has been sent
-func (a *ArkonoPlatz) ResultSentNow(result []*Result) {
+func (a *ArkonoPlatz) ResultSentNow(result []*vaccines.Result) {
 	a.resultSendLastAt = time.Now()
 	a.lastResult = result
 }

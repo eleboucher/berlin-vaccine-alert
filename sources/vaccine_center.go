@@ -1,4 +1,4 @@
-package main
+package sources
 
 import (
 	"encoding/json"
@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"reflect"
 	"time"
+
+	"github.com/eleboucher/covid/vaccines"
 )
 
 var centerURL = map[string]string{
@@ -42,11 +44,11 @@ type StatElement struct {
 // impfstoff.link/ website
 type VaccineCenter struct {
 	resultSendLastAt time.Time
-	lastResult       []*Result
+	lastResult       []*vaccines.Result
 }
 
 // Fetch fetches all the appointments and filter then and return the results
-func (v *VaccineCenter) Fetch() ([]*Result, error) {
+func (v *VaccineCenter) Fetch() ([]*vaccines.Result, error) {
 	url := "https://api.impfstoff.link/?v=0.3"
 
 	req, _ := http.NewRequest("GET", url, nil)
@@ -68,14 +70,14 @@ func (v *VaccineCenter) Fetch() ([]*Result, error) {
 		return nil, err
 	}
 
-	var ret []*Result
+	var ret []*vaccines.Result
 
 	for _, a := range resp.Stats {
 		if a.Open {
 			message := fmt.Sprintf("Appointment available at %s %s", a.Name, idToURL(a.ID))
-			ret = append(ret, &Result{
+			ret = append(ret, &vaccines.Result{
 				Message:     message,
-				VaccineName: VaccinationCenter,
+				VaccineName: vaccines.VaccinationCenter,
 			})
 		}
 	}
@@ -83,7 +85,7 @@ func (v *VaccineCenter) Fetch() ([]*Result, error) {
 }
 
 // ShouldSendResult check if the result should be send now
-func (v *VaccineCenter) ShouldSendResult(result []*Result) bool {
+func (v *VaccineCenter) ShouldSendResult(result []*vaccines.Result) bool {
 	if !reflect.DeepEqual(v.lastResult, result) && v.resultSendLastAt.Before(time.Now().Add(-1*time.Minute)) {
 		return true
 	}
@@ -94,7 +96,7 @@ func (v *VaccineCenter) ShouldSendResult(result []*Result) bool {
 }
 
 // ResultSentNow set that the appointment has been sent
-func (v *VaccineCenter) ResultSentNow(result []*Result) {
+func (v *VaccineCenter) ResultSentNow(result []*vaccines.Result) {
 	v.resultSendLastAt = time.Now()
 	v.lastResult = result
 }

@@ -1,4 +1,4 @@
-package main
+package sources
 
 import (
 	"bytes"
@@ -9,6 +9,7 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/eleboucher/covid/vaccines"
 	"github.com/google/go-querystring/query"
 )
 
@@ -38,13 +39,13 @@ type Doctolib struct {
 	VisitMotiveID    string `url:"visit_motive_ids"`
 	StartDate        string `url:"start_date"`
 	resultSendLastAt time.Time
-	lastResult       []*Result
+	lastResult       []*vaccines.Result
 }
 
 // Fetch fetches all the available appointment and filter then and return the results
-func (d *Doctolib) Fetch() ([]*Result, error) {
+func (d *Doctolib) Fetch() ([]*vaccines.Result, error) {
 	url := "https://www.doctolib.de/availabilities.json"
-	var ret Result
+	var ret vaccines.Result
 	startDate := time.Now()
 	for {
 		d.StartDate = startDate.Format("2006-01-02")
@@ -108,10 +109,10 @@ func (d *Doctolib) Fetch() ([]*Result, error) {
 		return nil, err
 	}
 	ret.Message = message
-	return []*Result{&ret}, nil
+	return []*vaccines.Result{&ret}, nil
 }
 
-func (d *Doctolib) formatMessage(result Result) (string, error) {
+func (d *Doctolib) formatMessage(result vaccines.Result) (string, error) {
 	res := struct {
 		URL         string
 		VaccineName string
@@ -137,7 +138,7 @@ func (d *Doctolib) formatMessage(result Result) (string, error) {
 }
 
 // ShouldSendResult check if the result should be send now
-func (d *Doctolib) ShouldSendResult(result []*Result) bool {
+func (d *Doctolib) ShouldSendResult(result []*vaccines.Result) bool {
 	if d.Delay == 0 {
 		d.Delay = 1
 	}
@@ -151,7 +152,7 @@ func (d *Doctolib) ShouldSendResult(result []*Result) bool {
 }
 
 // ResultSentNow set that the appointment has been sent
-func (d *Doctolib) ResultSentNow(result []*Result) {
+func (d *Doctolib) ResultSentNow(result []*vaccines.Result) {
 	d.resultSendLastAt = time.Now()
 	d.lastResult = result
 }

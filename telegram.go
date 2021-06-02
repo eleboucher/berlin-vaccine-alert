@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/eleboucher/covid/models/chat"
+	"github.com/eleboucher/covid/vaccines"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -95,7 +96,7 @@ func (t *Telegram) SendMessage(message string, channel int64) error {
 }
 
 // SendMessageToAllUser send a message to all the enabled users
-func (t *Telegram) SendMessageToAllUser(result *Result) error {
+func (t *Telegram) SendMessageToAllUser(result *vaccines.Result) error {
 	chats, err := t.chatModel.List(result.VaccineName)
 	if err != nil {
 		return err
@@ -163,7 +164,7 @@ func (t *Telegram) HandleNewUsers() error {
 					log.Error(err)
 				}
 			case azButton:
-				_, err := t.chatModel.UpdateFilters(update.Message.Chat.ID, AstraZeneca)
+				_, err := t.chatModel.UpdateFilters(update.Message.Chat.ID, vaccines.AstraZeneca)
 				if err != nil {
 					log.Error(err)
 					return
@@ -174,7 +175,7 @@ func (t *Telegram) HandleNewUsers() error {
 					return
 				}
 			case jjButton:
-				_, err := t.chatModel.UpdateFilters(update.Message.Chat.ID, JohnsonAndJohnson)
+				_, err := t.chatModel.UpdateFilters(update.Message.Chat.ID, vaccines.JohnsonAndJohnson)
 				if err != nil {
 					log.Error(err)
 					return
@@ -185,7 +186,7 @@ func (t *Telegram) HandleNewUsers() error {
 					return
 				}
 			case vcButton:
-				_, err := t.chatModel.UpdateFilters(update.Message.Chat.ID, VaccinationCenter)
+				_, err := t.chatModel.UpdateFilters(update.Message.Chat.ID, vaccines.VaccinationCenter)
 				if err != nil {
 					log.Error(err)
 					return
@@ -196,7 +197,7 @@ func (t *Telegram) HandleNewUsers() error {
 					return
 				}
 			case biontechButton:
-				_, err := t.chatModel.UpdateFilters(update.Message.Chat.ID, Pfizer)
+				_, err := t.chatModel.UpdateFilters(update.Message.Chat.ID, vaccines.Pfizer)
 				if err != nil {
 					log.Error(err)
 					return

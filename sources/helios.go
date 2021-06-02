@@ -1,4 +1,4 @@
-package main
+package sources
 
 import (
 	"encoding/json"
@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"reflect"
 	"time"
+
+	"github.com/eleboucher/covid/vaccines"
 )
 
 type RHelios struct {
@@ -54,13 +56,13 @@ type Purpose struct {
 // https://patienten.helios-gesundheit.de/ website
 type Helios struct {
 	resultSendLastAt time.Time
-	lastResult       []*Result
+	lastResult       []*vaccines.Result
 }
 
 const tHelios = "appointments for biontech available call https://patienten.helios-gesundheit.de/appointments/book-appointment?facility=10&physician=21646&purpose=33239&resource=58"
 
 // Fetch fetches all the available appointment and filter then and return the results
-func (h *Helios) Fetch() ([]*Result, error) {
+func (h *Helios) Fetch() ([]*vaccines.Result, error) {
 	url := "https://api.patienten.helios-gesundheit.de/api/appointment/resources/21646/purposes?insuranceTypeId=1&specialtyUUID=c619bfb1-9e18-404d-b960-dfac6c072490"
 
 	req, err := http.NewRequest("GET", url, nil)
@@ -84,16 +86,16 @@ func (h *Helios) Fetch() ([]*Result, error) {
 		return nil, err
 	}
 	if len(resp.Purposes) > 0 && resp.Purposes[0].BookingPlanUUID != nil {
-		var ret Result
-		ret.VaccineName = Biontech
+		var ret vaccines.Result
+		ret.VaccineName = vaccines.Biontech
 		ret.Message = tHelios
-		return []*Result{&ret}, nil
+		return []*vaccines.Result{&ret}, nil
 	}
 	return nil, nil
 }
 
 // ShouldSendResult check if the result should be send now
-func (h *Helios) ShouldSendResult(result []*Result) bool {
+func (h *Helios) ShouldSendResult(result []*vaccines.Result) bool {
 	if !reflect.DeepEqual(h.lastResult, result) && h.resultSendLastAt.Before(time.Now().Add(-1*time.Minute)) {
 		return true
 	}
@@ -104,7 +106,7 @@ func (h *Helios) ShouldSendResult(result []*Result) bool {
 }
 
 // ResultSentNow set that the appointment has been sent
-func (h *Helios) ResultSentNow(result []*Result) {
+func (h *Helios) ResultSentNow(result []*vaccines.Result) {
 	h.resultSendLastAt = time.Now()
 	h.lastResult = result
 }

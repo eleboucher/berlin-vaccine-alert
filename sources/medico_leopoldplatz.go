@@ -1,4 +1,4 @@
-package main
+package sources
 
 import (
 	"bytes"
@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/eleboucher/covid/vaccines"
 )
 
 const tMedicoLeopoldPlatz = "{{.Amount}} appointments for {{.Name}} available call 0304579790"
@@ -25,12 +26,12 @@ type resultMedicoLeopoldPlatz struct {
 // https://medico-leopoldplatz.de/ website
 type MedicoLeopoldPlatz struct {
 	resultSendLastAt time.Time
-	lastResult       []*Result
+	lastResult       []*vaccines.Result
 }
 
 // Fetch fetches all the available appointment and filter then and return the results
-func (m *MedicoLeopoldPlatz) Fetch() ([]*Result, error) {
-	var ret []*Result
+func (m *MedicoLeopoldPlatz) Fetch() ([]*vaccines.Result, error) {
+	var ret []*vaccines.Result
 	res, err := http.Get("https://medico-leopoldplatz.de/corona-covid-19-impfung/")
 	if err != nil {
 		return nil, err
@@ -52,7 +53,7 @@ func (m *MedicoLeopoldPlatz) Fetch() ([]*Result, error) {
 					return
 				}
 				name := matches[0][1]
-				if vaccineName, err := getVaccineName(name); err == nil {
+				if vaccineName, err := vaccines.GetVaccineName(name); err == nil {
 					amount, err := strconv.Atoi(matches[0][2])
 					if err != nil {
 						return
@@ -66,7 +67,7 @@ func (m *MedicoLeopoldPlatz) Fetch() ([]*Result, error) {
 					if err != nil {
 						return
 					}
-					ret = append(ret, &Result{
+					ret = append(ret, &vaccines.Result{
 						VaccineName: vaccineName,
 						Amount:      int64(amount),
 						Message:     message,
@@ -93,7 +94,7 @@ func (m *MedicoLeopoldPlatz) formatMessage(result resultMedicoLeopoldPlatz) (str
 }
 
 // ShouldSendResult check if the result should be send now
-func (m *MedicoLeopoldPlatz) ShouldSendResult(result []*Result) bool {
+func (m *MedicoLeopoldPlatz) ShouldSendResult(result []*vaccines.Result) bool {
 	if !reflect.DeepEqual(m.lastResult, result) && m.resultSendLastAt.Before(time.Now().Add(-1*time.Minute)) {
 		return true
 	}
@@ -104,7 +105,7 @@ func (m *MedicoLeopoldPlatz) ShouldSendResult(result []*Result) bool {
 }
 
 // ResultSentNow set that the appointment has been sent
-func (m *MedicoLeopoldPlatz) ResultSentNow(result []*Result) {
+func (m *MedicoLeopoldPlatz) ResultSentNow(result []*vaccines.Result) {
 	m.resultSendLastAt = time.Now()
 	m.lastResult = result
 }

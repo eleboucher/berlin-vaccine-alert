@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/eleboucher/covid/models/chat"
+	"github.com/eleboucher/covid/sources"
+	"github.com/eleboucher/covid/vaccines"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 
@@ -25,18 +27,11 @@ func init() {
 	log.SetLevel(log.InfoLevel)
 }
 
-// Result holds the information for a vaccine appointment
-type Result struct {
-	VaccineName string
-	Amount      int64
-	Message     string
-}
-
 // Fetcher is the type to allow fetching information for an appointment
 type Fetcher interface {
-	Fetch() ([]*Result, error)
-	ShouldSendResult(result []*Result) bool
-	ResultSentNow(result []*Result)
+	Fetch() ([]*vaccines.Result, error)
+	ShouldSendResult(result []*vaccines.Result) bool
+	ResultSentNow(result []*vaccines.Result)
 }
 
 func fetchAllAppointment(fetchers []Fetcher, bot *Telegram) {
@@ -108,123 +103,123 @@ func main() {
 	telegram := NewBot(bot, chatModel)
 
 	sources := []Fetcher{
-		&PuntoMedico{},
-		&VaccineCenter{},
-		&MedicoLeopoldPlatz{},
-		&ArkonoPlatz{},
-		&Helios{},
-		&Doctolib{
+		&sources.PuntoMedico{},
+		&sources.VaccineCenter{},
+		&sources.MedicoLeopoldPlatz{},
+		&sources.ArkonoPlatz{},
+		&sources.Helios{},
+		&sources.Doctolib{
 			URL:           "https://www.doctolib.de/praxis/brandenburg-an-der-havel/corona-schutzimpfung-gzb",
-			VaccineName:   JohnsonAndJohnson,
+			VaccineName:   vaccines.JohnsonAndJohnson,
 			PraticeID:     "186461",
 			AgendaID:      "472530",
 			VisitMotiveID: "2877045",
 			Detail:        "(for 40+)",
 			Delay:         10,
 		},
-		&Doctolib{
+		&sources.Doctolib{
 			URL:           "https://www.doctolib.de/praxis/brandenburg-an-der-havel/corona-schutzimpfung-gzb",
-			VaccineName:   AstraZeneca,
+			VaccineName:   vaccines.AstraZeneca,
 			PraticeID:     "186461",
 			AgendaID:      "472530",
 			VisitMotiveID: "2741487",
 			Detail:        "(for 40+)",
 			Delay:         10,
 		},
-		&Doctolib{
+		&sources.Doctolib{
 			URL:           "https://www.doctolib.de/allgemeinmedizin/berlin/sophie-ruggeberg",
-			VaccineName:   JohnsonAndJohnson,
+			VaccineName:   vaccines.JohnsonAndJohnson,
 			PraticeID:     "114976",
 			AgendaID:      "190434",
 			VisitMotiveID: "2886231",
 		},
-		&Doctolib{
+		&sources.Doctolib{
 			URL:           "https://www.doctolib.de/allgemeinmedizin/berlin/sophie-ruggeberg",
-			VaccineName:   AstraZeneca,
+			VaccineName:   vaccines.AstraZeneca,
 			PraticeID:     "114976",
 			AgendaID:      "190434",
 			VisitMotiveID: "2764198",
 		},
-		&Doctolib{
+		&sources.Doctolib{
 			URL:           "https://www.doctolib.de/facharzt-fur-hno/berlin/babak-mayelzadeh",
-			VaccineName:   AstraZeneca,
+			VaccineName:   vaccines.AstraZeneca,
 			PraticeID:     "120549",
 			AgendaID:      "305777",
 			VisitMotiveID: "2862419",
 		},
-		&Doctolib{
+		&sources.Doctolib{
 			URL:           "https://www.doctolib.de/facharzt-fur-hno/berlin/babak-mayelzadeh",
-			VaccineName:   JohnsonAndJohnson,
+			VaccineName:   vaccines.JohnsonAndJohnson,
 			PraticeID:     "120549",
 			AgendaID:      "305777",
 			VisitMotiveID: "2879179",
 		},
-		&Doctolib{
+		&sources.Doctolib{
 			URL:           "https://www.doctolib.de/facharzt-fur-hno/berlin/rafael-hardy",
-			VaccineName:   Pfizer,
+			VaccineName:   vaccines.Pfizer,
 			PraticeID:     "22563",
 			AgendaID:      "56915",
 			VisitMotiveID: "2733996",
 		},
-		&Doctolib{
+		&sources.Doctolib{
 			URL:           "https://www.doctolib.de/innere-und-allgemeinmediziner/berlin/oliver-staeck",
-			VaccineName:   AstraZeneca,
+			VaccineName:   vaccines.AstraZeneca,
 			PraticeID:     "178663",
 			AgendaID:      "268801",
 			VisitMotiveID: "2784656",
 		},
-		&Doctolib{
+		&sources.Doctolib{
 			URL:           "https://www.doctolib.de/innere-und-allgemeinmediziner/berlin/oliver-staeck",
-			VaccineName:   JohnsonAndJohnson,
+			VaccineName:   vaccines.JohnsonAndJohnson,
 			PraticeID:     "178663",
 			AgendaID:      "268801",
 			VisitMotiveID: "2885945",
 		},
-		&Doctolib{
+		&sources.Doctolib{
 			URL:           "https://www.doctolib.de/praxis/berlin/praxis-fuer-orthopaedie-und-unfallchirurgie-neukoelln",
-			VaccineName:   AstraZeneca,
+			VaccineName:   vaccines.AstraZeneca,
 			PraticeID:     "28436",
 			AgendaID:      "464751",
 			VisitMotiveID: "2811460",
 		},
-		&Doctolib{
+		&sources.Doctolib{
 			URL:           "https://www.doctolib.de/praxis/berlin/praxis-fuer-orthopaedie-und-unfallchirurgie-neukoelln",
-			VaccineName:   AstraZeneca,
+			VaccineName:   vaccines.AstraZeneca,
 			PraticeID:     "28436",
 			AgendaID:      "464751",
 			VisitMotiveID: "2811530",
 		},
-		&Doctolib{
+		&sources.Doctolib{
 			URL:           "https://www.doctolib.de/medizinisches-versorgungszentrum-mvz/berlin/ambulantes-gynaekologisches-operationszentrum",
-			VaccineName:   Pfizer,
+			VaccineName:   vaccines.Pfizer,
 			PraticeID:     "107774",
 			AgendaID:      "439400",
 			VisitMotiveID: "2757216",
 		},
-		&Doctolib{
+		&sources.Doctolib{
 			URL:           "https://www.doctolib.de/medizinisches-versorgungszentrum-mvz/berlin/ambulantes-gynaekologisches-operationszentrum",
-			VaccineName:   AstraZeneca,
+			VaccineName:   vaccines.AstraZeneca,
 			PraticeID:     "107774",
 			AgendaID:      "439400",
 			VisitMotiveID: "2885841",
 		},
-		&Doctolib{
+		&sources.Doctolib{
 			URL:           "https://www.doctolib.de/medizinisches-versorgungszentrum-mvz/berlin/ambulantes-gynaekologisches-operationszentrum",
-			VaccineName:   JohnsonAndJohnson,
+			VaccineName:   vaccines.JohnsonAndJohnson,
 			PraticeID:     "107774",
 			AgendaID:      "439400",
 			VisitMotiveID: "2880391",
 		},
-		&Doctolib{
+		&sources.Doctolib{
 			URL:           "https://www.doctolib.de/krankenhaus/berlin/gkh-havelhoehe-impfzentrum",
-			VaccineName:   AstraZeneca,
+			VaccineName:   vaccines.AstraZeneca,
 			PraticeID:     "162056",
 			AgendaID:      "469719",
 			VisitMotiveID: "2836657",
 		},
-		&Doctolib{
+		&sources.Doctolib{
 			URL:           "https://www.doctolib.de/krankenhaus/berlin/gkh-havelhoehe-impfzentrum",
-			VaccineName:   JohnsonAndJohnson,
+			VaccineName:   vaccines.JohnsonAndJohnson,
 			PraticeID:     "162056",
 			AgendaID:      "469719",
 			VisitMotiveID: "2898162",
