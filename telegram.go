@@ -9,7 +9,6 @@ import (
 	"github.com/eleboucher/covid/vaccines"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 )
 
 const (
@@ -112,11 +111,7 @@ func (t *Telegram) SendMessageToAllUser(result *vaccines.Result) error {
 			continue
 		}
 	}
-	err = t.SendMessage(result.Message, viper.GetInt64("telegram-channel"))
-	if err != nil {
-		log.Error(err)
-		return err
-	}
+
 	return nil
 }
 
