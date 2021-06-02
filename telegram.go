@@ -100,7 +100,7 @@ func (t *Telegram) SendMessageToAllUser(result *Result) error {
 		return err
 	}
 
-	fmt.Printf("sending message %s for %d\n", result.Message, len(chats))
+	fmt.Printf("sending message %s for %d users\n", result.Message, len(chats))
 
 	for _, chat := range chats {
 		chat := chat
