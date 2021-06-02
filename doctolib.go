@@ -12,7 +12,7 @@ import (
 	"github.com/google/go-querystring/query"
 )
 
-const tDoctolib = "{{.Amount}} appointments for {{.VaccineName}} available call {{.URL}}"
+const tDoctolib = "{{.Amount}} appointments for {{.VaccineName}} available {{.URL}}"
 
 type ResultDoctolib struct {
 	Availabilities []*Availability `json:"availabilities,omitempty"`
