@@ -97,6 +97,7 @@ func main() {
 		&PuntoMedico{},
 		&VaccineCenter{},
 		&MedicoLeopoldPlatz{},
+		&ArkonoPlatz{},
 		&Doctolib{
 			URL:           "https://www.doctolib.de/praxis/brandenburg-an-der-havel/corona-schutzimpfung-gzb",
 			VaccineName:   JohnsonAndJohnson,
