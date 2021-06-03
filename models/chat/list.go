@@ -10,7 +10,7 @@ func (m *Model) List(vaccineName *string) ([]*Chat, error) {
 		sq.Eq{"enabled": true})
 
 	if vaccineName != nil {
-		q.Where(
+		q = q.Where(
 			sq.Or{sq.Like{"filters": "%" + *vaccineName + "%"}, sq.Eq{"filters": nil}},
 		)
 	}
