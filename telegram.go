@@ -24,7 +24,7 @@ const (
 	biontechButton   = "Look for Biontech/Pfizer (not in vaccination centers)"
 	vcButton         = "Look for Vaccination Centers"
 	everythingButton = "Look for everything"
-	contributeButton = "Contribute"
+	contributeButton = "Contribute and support"
 	infoFilterButton = "Info about filters"
 	backButton       = "Back"
 )
