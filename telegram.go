@@ -1,14 +1,18 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/eleboucher/covid/models/chat"
 	"github.com/eleboucher/covid/vaccines"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/time/rate"
 )
 
 const (
@@ -59,6 +63,7 @@ var filtersKeyboard = tgbotapi.NewReplyKeyboard(
 // Telegram Holds the structure for the telegram bot
 type Telegram struct {
 	bot       *tgbotapi.BotAPI
+	limiter   *rate.Limiter
 	channel   int64
 	chatModel *chat.Model
 }
@@ -68,6 +73,7 @@ func NewBot(bot *tgbotapi.BotAPI, chatModel *chat.Model) *Telegram {
 	return &Telegram{
 		bot:       bot,
 		chatModel: chatModel,
+		limiter:   rate.NewLimiter(rate.Every(time.Second/30), 1),
 	}
 }
 
@@ -81,7 +87,12 @@ func (t *Telegram) SendMessage(message string, channel int64) error {
 		Text:                  message,
 		DisableWebPagePreview: true,
 	}
-	_, err := t.bot.Send(msg)
+	ctx := context.Background()
+	err := t.limiter.Wait(ctx)
+	if err != nil {
+		return err
+	}
+	_, err = t.bot.Send(msg)
 	if err != nil {
 		if err.Error() == "Forbidden: bot was blocked by the user" || err.Error() == "Forbidden: user is deactivated" {
 			_, err := t.chatModel.Delete(channel)
@@ -101,17 +112,23 @@ func (t *Telegram) SendMessageToAllUser(result *vaccines.Result) error {
 		return err
 	}
 
+	var wg sync.WaitGroup
+
+	wg.Add(len(chats))
 	log.Infof("sending message %s for %d users\n", result.Message, len(chats))
 
 	for _, chat := range chats {
 		chat := chat
-		err := t.SendMessage(result.Message, chat.ID)
-		if err != nil {
-			log.Error(err)
-			continue
-		}
+		go func() {
+			defer wg.Done()
+			chat := chat
+			err := t.SendMessage(result.Message, chat.ID)
+			if err != nil {
+				log.Error(err)
+			}
+		}()
 	}
-
+	wg.Wait()
 	return nil
 }
 
