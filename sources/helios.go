@@ -92,7 +92,7 @@ func (h *Helios) Fetch() ([]*vaccines.Result, error) {
 	}
 	if len(resp.Purposes) > 0 && resp.Purposes[0].BookingPlanUUID != nil {
 		var ret vaccines.Result
-		ret.VaccineName = vaccines.Biontech
+		ret.VaccineName = vaccines.Pfizer
 		ret.Message = tHelios
 		return []*vaccines.Result{&ret}, nil
 	}

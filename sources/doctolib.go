@@ -34,7 +34,7 @@ type Doctolib struct {
 	Detail           string
 	Delay            time.Duration
 	Limit            string `url:"limit"`
-	PraticeID        string `url:"pratice_ids"`
+	PracticeID       string `url:"pratice_ids"`
 	AgendaID         string `url:"agenda_ids"`
 	VisitMotiveID    string `url:"visit_motive_ids"`
 	StartDate        string `url:"start_date"`

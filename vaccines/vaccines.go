@@ -10,10 +10,11 @@ const (
 	AstraZeneca = "astra"
 	// JohnsonAndJohnson is the name for the JohnsonAndJohnson vaccine
 	JohnsonAndJohnson = "johnson"
-	// Biontech is the name for the biontech/pfizer vaccine
-	Biontech = "biontech"
-	// Pfizer is the other name for the biontech/pfizer vaccine
+	// Pfizer is the name for the biontech/pfizer vaccine
 	Pfizer = "pfizer"
+	// Biontech is the other name for the biontech/pfizer vaccine
+	// USE ONLY PFIZER
+	biontech = "biontech"
 	// Moderna is the name for the Moderna vaccine
 	Moderna = "moderna"
 	// VaccinationCenter correspond to the vaccination center
@@ -41,7 +42,7 @@ func GetVaccineName(name string) (string, error) {
 
 	for _, vaccine := range vaccines {
 		if strings.Contains(strings.ToLower(name), vaccine) || (vaccine == Pfizer &&
-			strings.Contains(strings.ToLower(name), Biontech)) {
+			strings.Contains(strings.ToLower(name), biontech)) {
 			return vaccine, nil
 		}
 	}
