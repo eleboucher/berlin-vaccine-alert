@@ -22,6 +22,18 @@ Compile the project using:
 go build
 ```
 
+run the database migration by installing:
+
+```bash
+go get -v github.com/rubenv/sql-migrate/...
+```
+
+and run the migration:
+
+```
+sql-migrate up -env production
+```
+
 and then start the project with:
 
 ```
