@@ -1,11 +1,8 @@
-FROM golang:1.16
-WORKDIR /go/src/github.com/eleboucher/berlin-vaccine-alert
-COPY . .
-RUN CGO_ENABLED=1 GOOS=linux go build -a -ldflags '-linkmode external -extldflags "-static"' -o app .
-
-FROM alpine:latest
+FROM golang:1.16-alpine
 RUN apk --no-cache add ca-certificates sqlite gcc musl-dev
 WORKDIR /root/
-COPY --from=0 /go/src/github.com/eleboucher/berlin-vaccine-alert/app .
-COPY  ./.config.yml .
+RUN go get -v github.com/rubenv/sql-migrate/...
+COPY . .
+RUN CGO_ENABLED=1 GOOS=linux go build -a -ldflags '-linkmode external -extldflags "-static"' -o app .
+RUN sql-migrate up -env production
 CMD ["./app", "run"]
