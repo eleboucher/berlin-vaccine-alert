@@ -1,7 +1,5 @@
-version: "3"
+version: "3.7"
 
 services:
   bot:
     build: .
-    volumes:
-      - ./database.db:/root/database.db

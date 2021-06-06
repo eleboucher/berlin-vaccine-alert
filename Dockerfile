@@ -5,4 +5,4 @@ RUN go get -v github.com/rubenv/sql-migrate/...
 COPY . .
 RUN CGO_ENABLED=1 GOOS=linux go build -a -ldflags '-linkmode external -extldflags "-static"' -o app .
 RUN sql-migrate up -env production
-CMD ["./app", "run"]
+ENTRYPOINT ["./app", "run"]

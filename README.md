@@ -12,6 +12,7 @@ Create a [telegram bot](https://core.telegram.org/bots#creating-a-new-bot) to ge
 
 Rename `.config.example.yml` to `.config.yml` and add your token in this file.
 
+
 ### Local
 
 This project use golang and sqlite3 make sure it is installed before following the next steps (unless you use docker).
