@@ -148,7 +148,7 @@ func (t *Telegram) HandleNewUsers() error {
 			if update.Message == nil { // ignore any non-Message Updates
 				return
 			}
-			logrus.Infof("Receiving new message: %#v", update.Message)
+			logrus.Infof("Receiving new message: %#s", update.Message.Text)
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
 			switch update.Message.Text {
 			case "open", backButton:
