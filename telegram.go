@@ -139,13 +139,14 @@ func (t *Telegram) HandleNewUsers() error {
 	if err != nil {
 		return err
 	}
-
+	var wg sync.WaitGroup
 	for update := range updates {
+		wg.Add(1)
 		go func(update tgbotapi.Update) {
+			defer wg.Done()
 			if update.Message == nil { // ignore any non-Message Updates
 				return
 			}
-
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
 			switch update.Message.Text {
 			case "open", backButton:
@@ -258,6 +259,8 @@ func (t *Telegram) HandleNewUsers() error {
 			}
 		}(update)
 	}
+
+	wg.Wait()
 	log.Info("done with telegram handler")
 	return nil
 }
