@@ -3,3 +3,6 @@ covid
 .config.yml
 
 database.db
+
+
+data/

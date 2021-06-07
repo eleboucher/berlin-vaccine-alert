@@ -1,4 +1,5 @@
-telegram-token: "TELEGRAM BOT TOKEN"
+TELEGRAM_TOKEN: "TELEGRAM BOT TOKEN"
+DATABASE_URL: "postgres://postgres@localhost:5432/berlin_vaccine_alert?sslmode=disable"
 
 doctolib:
   - url: "https://www.doctolib.de/praxis/brandenburg-an-der-havel/corona-schutzimpfung-gzb"

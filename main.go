@@ -124,7 +124,7 @@ func main() {
 		log.Error(err)
 		return
 	}
-	bot, err := tgbotapi.NewBotAPI(viper.GetString("telegram-token"))
+	bot, err := tgbotapi.NewBotAPI(viper.GetString("TELEGRAM_TOKEN"))
 	if err != nil {
 		log.Error(err)
 		return

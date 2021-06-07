@@ -1,10 +1,14 @@
 development:
-    dialect: sqlite3
-    datasource: database.db
-    dir: migrations
-
+  dialect: postgres
+  datasource: host=localhost port=5432 dbname=berlin_vaccine_alert user=postgres sslmode=disable
+  dir: migrations
 
 production:
-    dialect: sqlite3
-    datasource: database.db
-    dir: migrations
+  dialect: postgres
+  datasource: host=localhost port=5432 dbname=berlin_vaccine_alert user=postgres sslmode=disable
+  dir: migrations
+
+docker:
+  dialect: postgres
+  datasource: host=postgres port=5432 dbname=berlin_vaccine_alert user=postgres password=postgres sslmode=disable
+  dir: migrations

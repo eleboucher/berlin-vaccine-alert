@@ -39,6 +39,7 @@ func NewModel(db *sql.DB) *Model {
 func (model *Model) getSelectBuilder() sq.SelectBuilder {
 	return sq.
 		Select(fields...).
+		PlaceholderFormat(sq.Dollar).
 		From(tableName).
 		RunWith(model.db)
 }
@@ -47,6 +48,7 @@ func (model *Model) getSelectBuilder() sq.SelectBuilder {
 func (model *Model) getInsertBuilder() sq.InsertBuilder {
 	return sq.
 		Insert(tableName).
+		PlaceholderFormat(sq.Dollar).
 		RunWith(model.db).
 		Suffix(fmt.Sprintf("RETURNING %s", preparedFields))
 }
@@ -56,5 +58,6 @@ func (model *Model) getUpdateBuilder() sq.UpdateBuilder {
 	return sq.
 		Update(tableName).
 		RunWith(model.db).
+		PlaceholderFormat(sq.Dollar).
 		Suffix(fmt.Sprintf("RETURNING %s", preparedFields))
 }

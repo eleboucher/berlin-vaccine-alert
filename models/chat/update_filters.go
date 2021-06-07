@@ -24,7 +24,7 @@ func (m *Model) UpdateFilters(id int64, filter string) (*Chat, error) {
 		newFilters = &tmp
 	}
 
-	row := m.getUpdateBuilder().Where(sq.Eq{"id": id}).Set("filters", newFilters).RunWith(m.db).QueryRow()
+	row := m.getUpdateBuilder().Where(sq.Eq{"id": id}).Set("filters", newFilters).QueryRow()
 	chat, err = scanRow(row)
 	if err != nil {
 		if err == sql.ErrNoRows {

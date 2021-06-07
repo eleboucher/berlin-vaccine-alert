@@ -2,4 +2,21 @@ version: "3.7"
 
 services:
   bot:
+    tty: true
     build: .
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres:@postgres:5432/berlin_vaccine_alert
+      - DB_HOST=postgres
+      - DB_PORT=5432
+    entrypoint: bash -c "waitforservices -timeout=60 && sql-migrate up -env docker && ./app run"
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=berlin_vaccine_alert
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
