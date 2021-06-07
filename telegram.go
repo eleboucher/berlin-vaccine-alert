@@ -11,6 +11,7 @@ import (
 	"github.com/eleboucher/covid/models/chat"
 	"github.com/eleboucher/covid/vaccines"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/time/rate"
 )
@@ -147,6 +148,7 @@ func (t *Telegram) HandleNewUsers() error {
 			if update.Message == nil { // ignore any non-Message Updates
 				return
 			}
+			logrus.Infof("Receiving new message: %#v", update.Message)
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
 			switch update.Message.Text {
 			case "open", backButton:
