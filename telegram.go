@@ -152,7 +152,7 @@ func (t *Telegram) HandleNewUsers() error {
 			go func(update tgbotapi.Update) {
 				defer wg.Done()
 				msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
-				switch strings.ToLower(update.Message.Text) {
+				switch update.Message.Text {
 				case "open", backButton:
 					msg.ReplyMarkup = keyboard
 					t.bot.Send(msg)
