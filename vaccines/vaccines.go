@@ -17,8 +17,8 @@ const (
 	biontech = "biontech"
 	// Moderna is the name for the Moderna vaccine
 	Moderna = "moderna"
-	// VaccinationCenter correspond to the vaccination center
-	VaccinationCenter = "vaccination_center"
+	// MRNA correspond to the pfizer or moderna
+	MRNA = "MRNA"
 )
 
 // Result holds the information for a vaccine appointment
@@ -34,15 +34,16 @@ var ErrVaccineNotFound = errors.New("vaccine not found")
 var vaccines = []string{
 	AstraZeneca,
 	JohnsonAndJohnson,
-	Pfizer,
-	Moderna,
+	MRNA,
 }
 
 func GetVaccineName(name string) (string, error) {
-
 	for _, vaccine := range vaccines {
-		if strings.Contains(strings.ToLower(name), vaccine) || (vaccine == Pfizer &&
-			strings.Contains(strings.ToLower(name), biontech)) {
+		if strings.Contains(strings.ToLower(name), vaccine) ||
+			(vaccine == MRNA &&
+				strings.Contains(strings.ToLower(name), biontech) ||
+				strings.Contains(strings.ToLower(name), Pfizer) ||
+				strings.Contains(strings.ToLower(name), Moderna)) {
 			return vaccine, nil
 		}
 	}
