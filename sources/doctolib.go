@@ -29,17 +29,17 @@ type Availability struct {
 // Doctolib holds the information for fetching the information for the
 // doctolib website
 type Doctolib struct {
-	VaccineName      string
-	URL              string
-	Detail           string
-	Delay            time.Duration
-	Limit            string `url:"limit"`
-	PracticeID       string `url:"pratice_ids"`
-	AgendaID         string `url:"agenda_ids"`
-	VisitMotiveID    string `url:"visit_motive_ids"`
-	StartDate        string `url:"start_date"`
-	resultSendLastAt time.Time
-	lastResult       []*vaccines.Result
+	VaccineName      string             `url:"-"`
+	URL              string             `url:"-"`
+	Detail           string             `url:"-"`
+	Delay            time.Duration      `url:"-"`
+	Limit            string             `url:"limit"`
+	PracticeID       string             `url:"pratice_ids"`
+	AgendaID         string             `url:"agenda_ids"`
+	VisitMotiveID    string             `url:"visit_motive_ids"`
+	StartDate        string             `url:"start_date"`
+	resultSendLastAt time.Time          `url:"-"`
+	lastResult       []*vaccines.Result `url:"-"`
 }
 
 // Name return the name of the source
@@ -60,6 +60,9 @@ func (d *Doctolib) Fetch() ([]*vaccines.Result, error) {
 			return nil, err
 		}
 		req, err := http.NewRequest("GET", url+"?"+v.Encode(), nil)
+		req.Header.Add("authority", "www.doctolib.de")
+		req.Header.Add("accept", "application/json")
+		req.Header.Add("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36")
 		if err != nil {
 			return nil, err
 		}
