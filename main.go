@@ -9,11 +9,12 @@ import (
 	"github.com/eleboucher/covid/models/chat"
 	"github.com/eleboucher/covid/sources"
 	"github.com/eleboucher/covid/vaccines"
+	"github.com/evalphobia/logrus_sentry"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 // Fetcher is the type to allow fetching information for an appointment
@@ -107,15 +108,24 @@ func init() {
 		panic(fmt.Errorf("fatal error config file: %s", err))
 	}
 
+	hook, err := logrus_sentry.NewSentryHook(viper.GetString("SENTRY_DSN"), []logrus.Level{
+		logrus.PanicLevel,
+		logrus.FatalLevel,
+		logrus.ErrorLevel,
+	})
+	l := logrus.New()
+	if err == nil {
+		l.Hooks.Add(hook)
+	}
 	// Log as JSON instead of the default ASCII formatter.
-	log.SetFormatter(&log.JSONFormatter{})
+	l.SetFormatter(&log.JSONFormatter{})
 
 	// Output to stdout instead of the default stderr
 	// Can be any io.Writer, see below for File example
-	log.SetOutput(os.Stdout)
+	l.SetOutput(os.Stdout)
 
 	// Only log the warning severity or above.
-	log.SetLevel(log.InfoLevel)
+	l.SetLevel(log.InfoLevel)
 }
 
 func main() {
