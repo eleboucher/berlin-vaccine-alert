@@ -138,7 +138,7 @@ func main() {
 	}
 	chatModel := chat.NewModel(db)
 	telegram := NewBot(bot, chatModel)
-	doctolibs, err := getAllDoctolibSources()
+	// doctolibs, err := getAllDoctolibSources()
 	if err != nil {
 		log.Error(err)
 		return
@@ -150,7 +150,7 @@ func main() {
 		&sources.Helios{},
 	}
 
-	s = append(s, doctolibs...)
+	// s = append(s, doctolibs...)
 
 	var runCMD = &cobra.Command{
 		Use:   "run",
