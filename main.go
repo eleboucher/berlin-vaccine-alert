@@ -9,8 +9,9 @@ import (
 	"github.com/eleboucher/covid/models/chat"
 	"github.com/eleboucher/covid/sources"
 	"github.com/eleboucher/covid/vaccines"
-	"github.com/evalphobia/logrus_sentry"
+	"github.com/getsentry/sentry-go"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	"github.com/makasim/sentryhook"
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -107,27 +108,21 @@ func init() {
 	if err != nil {
 		panic(fmt.Errorf("fatal error config file: %s", err))
 	}
-
-	hook, err := logrus_sentry.NewSentryHook(viper.GetString("SENTRY_DSN"), []logrus.Level{
-		logrus.PanicLevel,
-		logrus.FatalLevel,
-		logrus.ErrorLevel,
-	})
-	l := logrus.New()
-	if err == nil {
-		l.Hooks.Add(hook)
-	} else {
-		panic(err)
+	if err := sentry.Init(sentry.ClientOptions{Dsn: viper.GetString("SENTRY_DSN")}); err != nil {
+		log.Fatal(err)
 	}
+
+	log.AddHook(sentryhook.New([]logrus.Level{logrus.PanicLevel, logrus.FatalLevel, logrus.ErrorLevel}))
+
 	// Log as JSON instead of the default ASCII formatter.
-	l.SetFormatter(&log.JSONFormatter{})
+	log.SetFormatter(&log.JSONFormatter{})
 
 	// Output to stdout instead of the default stderr
 	// Can be any io.Writer, see below for File example
-	l.SetOutput(os.Stdout)
+	log.SetOutput(os.Stdout)
 
 	// Only log the warning severity or above.
-	l.SetLevel(log.InfoLevel)
+	log.SetLevel(log.InfoLevel)
 }
 
 func main() {
