@@ -116,6 +116,8 @@ func init() {
 	l := logrus.New()
 	if err == nil {
 		l.Hooks.Add(hook)
+	} else {
+		panic(err)
 	}
 	// Log as JSON instead of the default ASCII formatter.
 	l.SetFormatter(&log.JSONFormatter{})
