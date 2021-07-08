@@ -5,7 +5,7 @@ go 1.16
 require (
 	github.com/Masterminds/squirrel v1.5.0
 	github.com/PuerkitoBio/goquery v1.6.1
-	github.com/getsentry/sentry-go v0.5.1
+	github.com/getsentry/sentry-go v0.11.0
 	github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible
 	github.com/google/go-cmp v0.5.5 // indirect
 	github.com/google/go-querystring v1.1.0
