@@ -194,7 +194,7 @@ func main() {
 						ChatID:           chat.ID,
 						ReplyToMessageID: 0,
 					},
-					Text:                  "Hey, Thanks again for using the bot!\n\nI added a lot of Doctolib clinic and doctors and the Arkonoplatz clinic",
+					Text:                  "Hey, Thanks again for using the bot!\n\n Sadly Doctolib banned my server IP due to too many request therefore the bot will only give result for appointment outside of doctolib until I can fix it",
 					DisableWebPagePreview: true,
 				}
 				_, err := bot.Send(msg)
