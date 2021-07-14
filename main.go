@@ -199,7 +199,8 @@ func main() {
 				}
 				_, err := bot.Send(msg)
 				if err != nil {
-					return err
+					log.Error(err)
+					continue
 				}
 			}
 			return nil
