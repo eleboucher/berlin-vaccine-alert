@@ -7,7 +7,6 @@ require (
 	github.com/PuerkitoBio/goquery v1.6.1
 	github.com/getsentry/sentry-go v0.11.0
 	github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible
-	github.com/google/go-cmp v0.5.5 // indirect
 	github.com/google/go-querystring v1.1.0
 	github.com/jackc/pgconn v1.8.1
 	github.com/jackc/pgerrcode v0.0.0-20201024163028-a0d42d470451
@@ -20,5 +19,4 @@ require (
 	github.com/technoweenie/multipartstreamer v1.0.1 // indirect
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
-	gopkg.in/ini.v1 v1.51.1 // indirect
 )
