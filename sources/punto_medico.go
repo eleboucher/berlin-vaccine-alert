@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/eleboucher/covid/vaccines"
+	"github.com/sirupsen/logrus"
 )
 
 const tPunto = "{{.Nr}} appointments for {{.Name}} available https://punctum-medico.de/onlinetermine/"
@@ -56,6 +57,7 @@ func (p *PuntoMedico) Fetch() ([]*vaccines.Result, error) {
 	if err != nil {
 		return nil, err
 	}
+	logrus.Error(string(body))
 	var resp TMessage
 	err = json.Unmarshal(body, &resp)
 	if err != nil {
