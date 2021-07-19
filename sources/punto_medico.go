@@ -42,7 +42,7 @@ func (p *PuntoMedico) Name() string {
 func (p *PuntoMedico) Fetch() ([]*vaccines.Result, error) {
 	url := "https://onlinetermine.zollsoft.de/includes/searchTermine_app_feature.php"
 
-	payload := strings.NewReader("versichert=&terminsuche=&uniqueident=60b9e14839fcc")
+	payload := strings.NewReader("versichert=1&terminsuche=&uniqueident=60b9e14839fcc")
 
 	req, _ := http.NewRequest("POST", url, payload)
 
