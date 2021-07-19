@@ -46,7 +46,7 @@ func (p *PuntoMedico) Fetch() ([]*vaccines.Result, error) {
 
 	req, _ := http.NewRequest("POST", url, payload)
 
-	req.Header.Add("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36")
+	req.Header.Add("content-type", "application/x-www-form-urlencoded; charset=UTF-8")
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
