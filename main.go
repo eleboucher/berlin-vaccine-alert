@@ -173,7 +173,7 @@ func main() {
 
 			go func() {
 				defer wg.Done()
-				for range time.Tick(5 * time.Second) {
+				for range time.Tick(30 * time.Second) {
 					go fetchAllAppointment(s, telegram)
 				}
 			}()

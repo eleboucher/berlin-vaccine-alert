@@ -6,11 +6,11 @@ import (
 	"io/ioutil"
 	"net/http"
 	"reflect"
+	"strings"
 	"text/template"
 	"time"
 
 	"github.com/eleboucher/covid/vaccines"
-	"github.com/google/go-querystring/query"
 )
 
 const tDoctolib = "{{.Amount}} appointments for {{.VaccineName}} {{.Detail}} available {{.URL}}"
@@ -29,17 +29,17 @@ type Availability struct {
 // Doctolib holds the information for fetching the information for the
 // doctolib website
 type Doctolib struct {
-	VaccineName      string             `url:"-"`
-	URL              string             `url:"-"`
-	Detail           string             `url:"-"`
-	Delay            time.Duration      `url:"-"`
-	Limit            string             `url:"limit"`
-	PracticeID       string             `url:"pratice_ids"`
-	AgendaID         string             `url:"agenda_ids"`
-	VisitMotiveID    string             `url:"visit_motive_ids"`
-	StartDate        string             `url:"start_date"`
-	resultSendLastAt time.Time          `url:"-"`
-	lastResult       []*vaccines.Result `url:"-"`
+	VaccineName      string             `json:"-"`
+	URL              string             `json:"-"`
+	Detail           string             `json:"-"`
+	Delay            time.Duration      `json:"-"`
+	Limit            string             `json:"limit"`
+	PracticeID       string             `json:"pratice_ids"`
+	AgendaID         string             `json:"agenda_ids"`
+	VisitMotiveID    string             `json:"visit_motive_ids"`
+	StartDate        string             `json:"start_date"`
+	resultSendLastAt time.Time          `json:"-"`
+	lastResult       []*vaccines.Result `json:"-"`
 }
 
 // Name return the name of the source
@@ -49,20 +49,18 @@ func (d *Doctolib) Name() string {
 
 // Fetch fetches all the available appointment and filter then and return the results
 func (d *Doctolib) Fetch() ([]*vaccines.Result, error) {
-	url := "https://www.doctolib.de/availabilities.json"
+	url := "https://doctolib-proxy.herokuapp.com/"
 	var ret vaccines.Result
 	startDate := time.Now()
 	for {
 		d.StartDate = startDate.Format("2006-01-02")
 		d.Limit = "1000"
-		v, err := query.Values(d)
+		payload, err := json.Marshal(d)
 		if err != nil {
 			return nil, err
 		}
-		req, err := http.NewRequest("GET", url+"?"+v.Encode(), nil)
-		req.Header.Add("authority", "www.doctolib.de")
-		req.Header.Add("accept", "application/json")
-		req.Header.Add("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36")
+		req, err := http.NewRequest("POST", url, strings.NewReader(string(payload)))
+
 		if err != nil {
 			return nil, err
 		}
