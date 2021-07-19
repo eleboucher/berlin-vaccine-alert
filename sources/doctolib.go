@@ -49,7 +49,7 @@ func (d *Doctolib) Name() string {
 
 // Fetch fetches all the available appointment and filter then and return the results
 func (d *Doctolib) Fetch() ([]*vaccines.Result, error) {
-	url := "https://doctolib-proxy.herokuapp.com/doctolib"
+	url := "http://doctolib-proxy.herokuapp.com/doctolib"
 	var ret vaccines.Result
 	startDate := time.Now()
 	for {
