@@ -80,7 +80,7 @@ func (a *ArkonoPlatzJJ) Fetch() ([]*vaccines.Result, error) {
 	}
 
 	var ret vaccines.Result
-	ret.VaccineName = vaccines.AstraZeneca
+	ret.VaccineName = vaccines.JohnsonAndJohnson
 	message, err := a.formatMessage(ret)
 	if err != nil {
 		return nil, err
