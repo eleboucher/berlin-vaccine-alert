@@ -147,6 +147,8 @@ func main() {
 		&sources.PuntoMedico{},
 		&sources.MedicoLeopoldPlatz{},
 		&sources.ArkonoPlatz{},
+		&sources.ArkonoPlatzJJ{},
+		&sources.ArkonoPlatzPfizer{},
 		&sources.Helios{},
 	}
 
