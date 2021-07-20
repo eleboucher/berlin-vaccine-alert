@@ -5,11 +5,13 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"reflect"
 	"strings"
 	"text/template"
 	"time"
 
+	"github.com/eleboucher/covid/internals/proxy"
 	"github.com/eleboucher/covid/vaccines"
 )
 
@@ -53,6 +55,11 @@ func (d *Doctolib) Fetch() ([]*vaccines.Result, error) {
 	var ret vaccines.Result
 	startDate := time.Now()
 	for {
+		prx, err := proxy.GetProxy()
+		if err != nil {
+			return nil, err
+		}
+		os.Setenv("HTTP_PROXY", "http://"+prx)
 		d.StartDate = startDate.Format("2006-01-02")
 		d.Limit = "1000"
 		payload, err := json.Marshal(d)
