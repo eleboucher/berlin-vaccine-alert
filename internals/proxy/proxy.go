@@ -38,7 +38,7 @@ type Support struct {
 	Google    int64 `json:"google"`
 }
 
-var limiter = rate.NewLimiter(rate.Every(time.Second), 1)
+var limiter = rate.NewLimiter(rate.Every(2*time.Second), 1)
 
 var ctx = context.Background()
 
