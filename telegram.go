@@ -93,7 +93,7 @@ func (t *Telegram) SendMessage(message string, channel int64) error {
 	}
 	_, err = t.bot.Send(msg)
 	if err != nil {
-		if strings.Contains(err.Error(), "Forbidden: bot was") {
+		if strings.Contains(err.Error(), "Forbidden:") {
 			_, err := t.chatModel.Delete(channel)
 			if err != nil {
 				return err
