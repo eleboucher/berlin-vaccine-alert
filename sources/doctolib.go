@@ -13,7 +13,6 @@ import (
 	"github.com/eleboucher/covid/internals/proxy"
 	"github.com/eleboucher/covid/vaccines"
 	"github.com/google/go-querystring/query"
-	"github.com/sirupsen/logrus"
 )
 
 const tDoctolib = "{{.Amount}} appointments for {{.VaccineName}} {{.Detail}} available {{.URL}}"
@@ -80,7 +79,6 @@ func (d *Doctolib) Fetch() ([]*vaccines.Result, error) {
 		}
 		defer res.Body.Close()
 		body, err := ioutil.ReadAll(res.Body)
-		logrus.Error(string(body))
 		if err != nil {
 			d.Proxy.RenewProxy()
 			return nil, err
