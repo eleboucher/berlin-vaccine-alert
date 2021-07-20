@@ -7,12 +7,12 @@ import (
 	"net/http"
 	"os"
 	"reflect"
-	"strings"
 	"text/template"
 	"time"
 
 	"github.com/eleboucher/covid/internals/proxy"
 	"github.com/eleboucher/covid/vaccines"
+	"github.com/google/go-querystring/query"
 )
 
 const tDoctolib = "{{.Amount}} appointments for {{.VaccineName}} {{.Detail}} available {{.URL}}"
@@ -31,17 +31,17 @@ type Availability struct {
 // Doctolib holds the information for fetching the information for the
 // doctolib website
 type Doctolib struct {
-	VaccineName      string             `json:"-"`
-	URL              string             `json:"-"`
-	Detail           string             `json:"-"`
-	Delay            time.Duration      `json:"-"`
-	Limit            string             `json:"limit"`
-	PracticeID       string             `json:"pratice_ids"`
-	AgendaID         string             `json:"agenda_ids"`
-	VisitMotiveID    string             `json:"visit_motive_ids"`
-	StartDate        string             `json:"start_date"`
-	resultSendLastAt time.Time          `json:"-"`
-	lastResult       []*vaccines.Result `json:"-"`
+	VaccineName      string             `url:"-"`
+	URL              string             `url:"-"`
+	Detail           string             `url:"-"`
+	Delay            time.Duration      `url:"-"`
+	Limit            string             `url:"limit"`
+	PracticeID       string             `url:"pratice_ids"`
+	AgendaID         string             `url:"agenda_ids"`
+	VisitMotiveID    string             `url:"visit_motive_ids"`
+	StartDate        string             `url:"start_date"`
+	resultSendLastAt time.Time          `url:"-"`
+	lastResult       []*vaccines.Result `url:"-"`
 }
 
 // Name return the name of the source
@@ -51,7 +51,7 @@ func (d *Doctolib) Name() string {
 
 // Fetch fetches all the available appointment and filter then and return the results
 func (d *Doctolib) Fetch() ([]*vaccines.Result, error) {
-	url := "http://doctolib-proxy.herokuapp.com/doctolib"
+	url := "https://www.doctolib.de/availabilities.json"
 	var ret vaccines.Result
 	startDate := time.Now()
 	for {
@@ -62,11 +62,12 @@ func (d *Doctolib) Fetch() ([]*vaccines.Result, error) {
 		os.Setenv("HTTP_PROXY", "http://"+prx)
 		d.StartDate = startDate.Format("2006-01-02")
 		d.Limit = "1000"
-		payload, err := json.Marshal(d)
+
+		v, err := query.Values(d)
 		if err != nil {
 			return nil, err
 		}
-		req, err := http.NewRequest("POST", url, strings.NewReader(string(payload)))
+		req, err := http.NewRequest("GET", url+"?"+v.Encode(), nil)
 
 		if err != nil {
 			return nil, err
