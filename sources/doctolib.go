@@ -13,6 +13,7 @@ import (
 	"github.com/eleboucher/covid/internals/proxy"
 	"github.com/eleboucher/covid/vaccines"
 	"github.com/google/go-querystring/query"
+	"github.com/sirupsen/logrus"
 )
 
 const tDoctolib = "{{.Amount}} appointments for {{.VaccineName}} {{.Detail}} available {{.URL}}"
@@ -68,7 +69,9 @@ func (d *Doctolib) Fetch() ([]*vaccines.Result, error) {
 			return nil, err
 		}
 		req, err := http.NewRequest("GET", url+"?"+v.Encode(), nil)
-
+		req.Header.Add("authority", "www.doctolib.de")
+		req.Header.Add("accept", "application/json")
+		req.Header.Add("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36")
 		if err != nil {
 			return nil, err
 		}
@@ -78,7 +81,7 @@ func (d *Doctolib) Fetch() ([]*vaccines.Result, error) {
 		}
 		defer res.Body.Close()
 		body, err := ioutil.ReadAll(res.Body)
-
+		logrus.Error(string(body))
 		if err != nil {
 			return nil, err
 		}
