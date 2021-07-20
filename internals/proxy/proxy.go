@@ -40,9 +40,10 @@ type Support struct {
 
 var limiter = rate.NewLimiter(rate.Every(time.Second), 1)
 
+var ctx = context.Background()
+
 func GetProxy() (string, error) {
 	url := "http://pubproxy.com/api/proxy?user_agent=true&https=true"
-	ctx := context.Background()
 	err := limiter.Wait(ctx)
 	if err != nil {
 		return "", err
