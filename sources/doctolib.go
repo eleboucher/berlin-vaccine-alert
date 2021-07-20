@@ -58,6 +58,7 @@ func (d *Doctolib) Fetch() ([]*vaccines.Result, error) {
 	for {
 
 		os.Setenv("HTTP_PROXY", d.Proxy.Proxy())
+		os.Setenv("HTTPS_PROXY", d.Proxy.Proxy())
 		d.StartDate = startDate.Format("2006-01-02")
 		d.Limit = "1000"
 
