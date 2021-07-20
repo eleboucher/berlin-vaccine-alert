@@ -42,7 +42,30 @@ var limiter = rate.NewLimiter(rate.Every(2*time.Second), 1)
 
 var ctx = context.Background()
 
-func GetProxy() (string, error) {
+type Proxy struct {
+	IPPort string
+}
+
+func (p *Proxy) Proxy() string {
+	if p.IPPort == "" {
+		ipPort, err := fetchProxy()
+		if err != nil {
+			logrus.Error(err)
+		}
+		p.IPPort = ipPort
+	}
+	return p.IPPort
+}
+
+func (p *Proxy) RenewProxy() {
+	ipPort, err := fetchProxy()
+	if err != nil {
+		logrus.Error(err)
+	}
+	p.IPPort = ipPort
+}
+
+func fetchProxy() (string, error) {
 	url := "http://pubproxy.com/api/proxy?user_agent=true&https=true"
 	err := limiter.Wait(ctx)
 	if err != nil {

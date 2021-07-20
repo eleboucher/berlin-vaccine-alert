@@ -43,6 +43,7 @@ type Doctolib struct {
 	StartDate        string             `url:"start_date"`
 	resultSendLastAt time.Time          `url:"-"`
 	lastResult       []*vaccines.Result `url:"-"`
+	Proxy            *proxy.Proxy       `url:"-"`
 }
 
 // Name return the name of the source
@@ -56,11 +57,8 @@ func (d *Doctolib) Fetch() ([]*vaccines.Result, error) {
 	var ret vaccines.Result
 	startDate := time.Now()
 	for {
-		prx, err := proxy.GetProxy()
-		if err != nil {
-			return nil, err
-		}
-		os.Setenv("HTTP_PROXY", "http://"+prx)
+
+		os.Setenv("HTTP_PROXY", "http://"+d.Proxy.Proxy())
 		d.StartDate = startDate.Format("2006-01-02")
 		d.Limit = "1000"
 
@@ -77,12 +75,14 @@ func (d *Doctolib) Fetch() ([]*vaccines.Result, error) {
 		}
 		res, err := http.DefaultClient.Do(req)
 		if err != nil {
+			d.Proxy.RenewProxy()
 			return nil, err
 		}
 		defer res.Body.Close()
 		body, err := ioutil.ReadAll(res.Body)
 		logrus.Error(string(body))
 		if err != nil {
+			d.Proxy.RenewProxy()
 			return nil, err
 		}
 		var resp ResultDoctolib

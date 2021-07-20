@@ -6,6 +6,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/eleboucher/covid/internals/proxy"
 	"github.com/eleboucher/covid/models/chat"
 	"github.com/eleboucher/covid/sources"
 	"github.com/eleboucher/covid/vaccines"
@@ -81,6 +82,7 @@ func getAllDoctolibSources() ([]Fetcher, error) {
 	if err != nil {
 		return nil, err
 	}
+	prxy := &proxy.Proxy{}
 	for _, doctolibConfig := range doctolibConfigs {
 		tmp := sources.Doctolib{
 			URL:           doctolibConfig.URL,
@@ -88,6 +90,7 @@ func getAllDoctolibSources() ([]Fetcher, error) {
 			AgendaID:      doctolibConfig.AgendaID,
 			VisitMotiveID: doctolibConfig.VisitMotiveID,
 			VaccineName:   doctolibConfig.VaccineName,
+			Proxy:         prxy,
 		}
 		if doctolibConfig.Delay != nil {
 			tmp.Delay = time.Duration(*doctolibConfig.Delay)
