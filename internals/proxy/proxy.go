@@ -74,7 +74,7 @@ func (p *Proxy) RenewProxy() {
 }
 
 func fetchProxy() (string, error) {
-	url := "https://gimmeproxy.com/api/getProxy?user-agent=true&supportsHttps=true"
+	url := "https://gimmeproxy.com/api/getProxy?user-agent=true&supportsHttps=true&protocol=http"
 	err := limiter.Wait(ctx)
 	if err != nil {
 		return "", err
