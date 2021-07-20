@@ -12,30 +12,38 @@ import (
 )
 
 type Response struct {
-	Data  []Datum `json:"data"`
-	Count int64   `json:"count"`
+	SupportsHTTPS      bool           `json:"supportsHttps"`
+	Protocol           string         `json:"protocol"`
+	IP                 string         `json:"ip"`
+	Port               string         `json:"port"`
+	Get                bool           `json:"get"`
+	Post               bool           `json:"post"`
+	Cookies            bool           `json:"cookies"`
+	Referer            bool           `json:"referer"`
+	UserAgent          bool           `json:"user-agent"`
+	AnonymityLevel     int64          `json:"anonymityLevel"`
+	Websites           Websites       `json:"websites"`
+	Country            interface{}    `json:"country"`
+	UnixTimestampMS    int64          `json:"unixTimestampMs"`
+	TsChecked          int64          `json:"tsChecked"`
+	UnixTimestamp      int64          `json:"unixTimestamp"`
+	Curl               string         `json:"curl"`
+	IPPort             string         `json:"ipPort"`
+	Type               string         `json:"type"`
+	Speed              float64        `json:"speed"`
+	OtherProtocols     OtherProtocols `json:"otherProtocols"`
+	VerifiedSecondsAgo int64          `json:"verifiedSecondsAgo"`
 }
 
-type Datum struct {
-	IPPort      string  `json:"ipPort"`
-	IP          string  `json:"ip"`
-	Port        string  `json:"port"`
-	Country     string  `json:"country"`
-	LastChecked string  `json:"last_checked"`
-	ProxyLevel  string  `json:"proxy_level"`
-	Type        string  `json:"type"`
-	Speed       string  `json:"speed"`
-	Support     Support `json:"support"`
+type OtherProtocols struct {
 }
 
-type Support struct {
-	HTTPS     int64 `json:"https"`
-	Get       int64 `json:"get"`
-	Post      int64 `json:"post"`
-	Cookies   int64 `json:"cookies"`
-	Referer   int64 `json:"referer"`
-	UserAgent int64 `json:"user_agent"`
-	Google    int64 `json:"google"`
+type Websites struct {
+	Example    bool `json:"example"`
+	Google     bool `json:"google"`
+	Amazon     bool `json:"amazon"`
+	Yelp       bool `json:"yelp"`
+	GoogleMaps bool `json:"google_maps"`
 }
 
 var limiter = rate.NewLimiter(rate.Every(2*time.Second), 1)
@@ -66,7 +74,7 @@ func (p *Proxy) RenewProxy() {
 }
 
 func fetchProxy() (string, error) {
-	url := "http://pubproxy.com/api/proxy?user_agent=true&https=true"
+	url := "https://gimmeproxy.com/api/getProxy?user-agent=true&supportsHttps=true"
 	err := limiter.Wait(ctx)
 	if err != nil {
 		return "", err
@@ -91,5 +99,5 @@ func fetchProxy() (string, error) {
 
 		return "", err
 	}
-	return resp.Data[0].IPPort, nil
+	return resp.Curl, nil
 }
