@@ -1,4 +1,4 @@
-module github.com/eleboucher/covid
+module github.com/eleboucher/berlin-vaccine-alert
 
 go 1.16
 

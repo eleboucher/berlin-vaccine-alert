@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/eleboucher/covid/vaccines"
+	"github.com/eleboucher/berlin-vaccine-alert/vaccines"
 )
 
 const tMedicoLeopoldPlatz = "{{.Amount}} appointments for {{.Name}} available call 0304579790"

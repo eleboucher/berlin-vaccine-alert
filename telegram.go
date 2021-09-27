@@ -8,8 +8,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/eleboucher/covid/models/chat"
-	"github.com/eleboucher/covid/vaccines"
+	"github.com/eleboucher/berlin-vaccine-alert/models/chat"
+	"github.com/eleboucher/berlin-vaccine-alert/vaccines"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"

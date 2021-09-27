@@ -10,7 +10,7 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/eleboucher/covid/vaccines"
+	"github.com/eleboucher/berlin-vaccine-alert/vaccines"
 )
 
 const tPunto = "{{.Nr}} appointments for {{.Name}} available https://punctum-medico.de/onlinetermine/"

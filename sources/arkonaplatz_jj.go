@@ -10,7 +10,7 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/eleboucher/covid/vaccines"
+	"github.com/eleboucher/berlin-vaccine-alert/vaccines"
 )
 
 // ArkonoPlatzJJ holds the information for fetching the information for the

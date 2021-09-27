@@ -10,8 +10,8 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/eleboucher/covid/internals/proxy"
-	"github.com/eleboucher/covid/vaccines"
+	"github.com/eleboucher/berlin-vaccine-alert/internals/proxy"
+	"github.com/eleboucher/berlin-vaccine-alert/vaccines"
 	"github.com/google/go-querystring/query"
 )
 

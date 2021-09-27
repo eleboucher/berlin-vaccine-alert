@@ -10,7 +10,7 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/eleboucher/covid/vaccines"
+	"github.com/eleboucher/berlin-vaccine-alert/vaccines"
 )
 
 const tArkonoPlatz = "Appointments for {{.VaccineName}} available https://praxis-arkonaplatz.termin-direkt.de/public/book"

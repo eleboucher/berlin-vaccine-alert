@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/eleboucher/covid/vaccines"
+	"github.com/eleboucher/berlin-vaccine-alert/vaccines"
 )
 
 type RHelios struct {
