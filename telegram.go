@@ -10,7 +10,8 @@ import (
 
 	"github.com/eleboucher/berlin-vaccine-alert/models/chat"
 	"github.com/eleboucher/berlin-vaccine-alert/vaccines"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/time/rate"
@@ -136,10 +137,7 @@ func (t *Telegram) HandleNewUsers() error {
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 
-	updates, err := t.bot.GetUpdatesChan(u)
-	if err != nil {
-		return err
-	}
+	updates := t.bot.GetUpdatesChan(u)
 	for update := range updates {
 		update := update
 		go func() {
@@ -151,18 +149,27 @@ func (t *Telegram) HandleNewUsers() error {
 			switch update.Message.Text {
 			case "open", backButton:
 				msg.ReplyMarkup = keyboard
-				t.bot.Send(msg)
+				_, err := t.bot.Send(msg)
+				if err != nil {
+					log.Error(err)
+				}
 			case "close":
 				msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
-				t.bot.Send(msg)
+				_, err := t.bot.Send(msg)
+				if err != nil {
+					log.Error(err)
+				}
 			case contributeButton:
-				err = t.SendMessage("Hey you 🚀,\nThanks a lot for using the bot,\n\n\nFeel free to contribute on Github: https://github.com/eleboucher/berlin-vaccine-alert\n\n\nOr feel free to contribute on Paypal https://paypal.me/ELeboucher or Buy me a beer https://www.buymeacoffee.com/eleboucher", update.Message.Chat.ID)
+				err := t.SendMessage("Hey you 🚀,\nThanks a lot for using the bot,\n\n\nFeel free to contribute on Github: https://github.com/eleboucher/berlin-vaccine-alert\n\n\nOr feel free to contribute on Paypal https://paypal.me/ELeboucher or Buy me a beer https://www.buymeacoffee.com/eleboucher", update.Message.Chat.ID)
 				if err != nil {
 					log.Error(err)
 				}
 			case filterButton:
 				msg.ReplyMarkup = filtersKeyboard
-				t.bot.Send(msg)
+				_, err := t.bot.Send(msg)
+				if err != nil {
+					log.Error(err)
+				}
 			case stopButton:
 				err := t.stopChat(update.Message.Chat.ID)
 				if err != nil {
@@ -242,7 +249,7 @@ func (t *Telegram) HandleNewUsers() error {
 				msg.ReplyMarkup = filtersKeyboard
 				t.bot.Send(msg)
 			case "contribute":
-				err = t.SendMessage("Hey you 🚀,\nThanks a lot for using the bot,\n\n\nFeel free to contribute on Github: https://github.com/eleboucher/berlin-vaccine-alert\n\n\nOr feel free to contribute on Paypal https://paypal.me/ELeboucher or Buy me a beer https://www.buymeacoffee.com/eleboucher", update.Message.Chat.ID)
+				err := t.SendMessage("Hey you 🚀,\nThanks a lot for using the bot,\n\n\nFeel free to contribute on Github: https://github.com/eleboucher/berlin-vaccine-alert\n\n\nOr feel free to contribute on Paypal https://paypal.me/ELeboucher or Buy me a beer https://www.buymeacoffee.com/eleboucher", update.Message.Chat.ID)
 				if err != nil {
 					log.Error(err)
 				}
