@@ -36,28 +36,28 @@ func NewModel(db *sql.DB) *Model {
 }
 
 // getSelectBuilder returns a SELECT statement builder for the chat model
-func (model *Model) getSelectBuilder() sq.SelectBuilder {
+func (m *Model) getSelectBuilder() sq.SelectBuilder {
 	return sq.
 		Select(fields...).
 		PlaceholderFormat(sq.Dollar).
 		From(tableName).
-		RunWith(model.db)
+		RunWith(m.db)
 }
 
 // getInsertBuilder returns a INSERT statement builder for the chat model
-func (model *Model) getInsertBuilder() sq.InsertBuilder {
+func (m *Model) getInsertBuilder() sq.InsertBuilder {
 	return sq.
 		Insert(tableName).
 		PlaceholderFormat(sq.Dollar).
-		RunWith(model.db).
+		RunWith(m.db).
 		Suffix(fmt.Sprintf("RETURNING %s", preparedFields))
 }
 
 // getUpdateBuilder returns a Update statement builder for the chat model
-func (model *Model) getUpdateBuilder() sq.UpdateBuilder {
+func (m *Model) getUpdateBuilder() sq.UpdateBuilder {
 	return sq.
 		Update(tableName).
-		RunWith(model.db).
+		RunWith(m.db).
 		PlaceholderFormat(sq.Dollar).
 		Suffix(fmt.Sprintf("RETURNING %s", preparedFields))
 }
