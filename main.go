@@ -11,7 +11,7 @@ import (
 	"github.com/eleboucher/berlin-vaccine-alert/sources"
 	"github.com/eleboucher/berlin-vaccine-alert/vaccines"
 	"github.com/getsentry/sentry-go"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/makasim/sentryhook"
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
@@ -141,11 +141,6 @@ func main() {
 	}
 	chatModel := chat.NewModel(db)
 	telegram := NewBot(bot, chatModel)
-	// doctolibs, err := getAllDoctolibSources()
-	if err != nil {
-		log.Error(err)
-		return
-	}
 	var s = []Fetcher{
 		&sources.PuntoMedico{},
 		&sources.MedicoLeopoldPlatz{},
