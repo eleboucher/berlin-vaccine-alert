@@ -7,6 +7,7 @@ require (
 	github.com/PuerkitoBio/goquery v1.6.1
 	github.com/getsentry/sentry-go v0.11.0
 	github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible
+	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1
 	github.com/google/go-querystring v1.1.0
 	github.com/jackc/pgconn v1.8.1
 	github.com/jackc/pgerrcode v0.0.0-20201024163028-a0d42d470451

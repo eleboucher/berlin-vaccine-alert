@@ -6,12 +6,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/eleboucher/berlin-vaccine-alert/internals/proxy"
 	"github.com/eleboucher/berlin-vaccine-alert/models/chat"
 	"github.com/eleboucher/berlin-vaccine-alert/sources"
 	"github.com/eleboucher/berlin-vaccine-alert/vaccines"
+
 	"github.com/getsentry/sentry-go"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/makasim/sentryhook"
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
@@ -75,34 +75,6 @@ func fetchAllAppointment(fetchers []Fetcher, bot *Telegram) {
 	}
 }
 
-func getAllDoctolibSources() ([]Fetcher, error) {
-	var doctolibConfigs []*DoctolibConfig
-	var ret []Fetcher
-	err := viper.UnmarshalKey("doctolib", &doctolibConfigs)
-	if err != nil {
-		return nil, err
-	}
-	prxy := &proxy.Proxy{}
-	for _, doctolibConfig := range doctolibConfigs {
-		tmp := sources.Doctolib{
-			URL:           doctolibConfig.URL,
-			PracticeID:    doctolibConfig.PracticeID,
-			AgendaID:      doctolibConfig.AgendaID,
-			VisitMotiveID: doctolibConfig.VisitMotiveID,
-			VaccineName:   doctolibConfig.VaccineName,
-			Proxy:         prxy,
-		}
-		if doctolibConfig.Delay != nil {
-			tmp.Delay = time.Duration(*doctolibConfig.Delay)
-		}
-		if doctolibConfig.Detail != nil {
-			tmp.Detail = *doctolibConfig.Detail
-		}
-		ret = append(ret, &tmp)
-	}
-	return ret, nil
-}
-
 func init() {
 	viper.SetConfigName(".config")
 	viper.SetConfigType("yaml")
@@ -141,11 +113,7 @@ func main() {
 	}
 	chatModel := chat.NewModel(db)
 	telegram := NewBot(bot, chatModel)
-	// doctolibs, err := getAllDoctolibSources()
-	if err != nil {
-		log.Error(err)
-		return
-	}
+
 	var s = []Fetcher{
 		&sources.PuntoMedico{},
 		&sources.MedicoLeopoldPlatz{},
@@ -154,8 +122,6 @@ func main() {
 		&sources.ArkonoPlatzPfizer{},
 		&sources.Helios{},
 	}
-
-	// s = append(s, doctolibs...)
 
 	var runCMD = &cobra.Command{
 		Use:   "run",
@@ -214,5 +180,8 @@ func main() {
 	rootCmd.AddCommand(runCMD)
 	rootCmd.AddCommand(sendCMD)
 
-	rootCmd.Execute()
+	err = rootCmd.Execute()
+	if err != nil {
+		log.Error(err)
+	}
 }
