@@ -64,7 +64,6 @@ var filtersKeyboard = tgbotapi.NewReplyKeyboard(
 type Telegram struct {
 	bot       *tgbotapi.BotAPI
 	limiter   *rate.Limiter
-	channel   int64
 	chatModel *chat.Model
 }
 
@@ -144,7 +143,7 @@ func (t *Telegram) HandleNewUsers() error {
 			if update.Message == nil { // ignore any non-Message Updates
 				return
 			}
-			logrus.Infof("Receiving new message: %#s", update.Message)
+			logrus.Infof("Receiving new message: %#v", update.Message)
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
 			switch update.Message.Text {
 			case "open", backButton:
@@ -247,7 +246,10 @@ func (t *Telegram) HandleNewUsers() error {
 				}
 			case "open":
 				msg.ReplyMarkup = filtersKeyboard
-				t.bot.Send(msg)
+				_, err := t.bot.Send(msg)
+				if err != nil {
+					log.Error(err)
+				}
 			case "contribute":
 				err := t.SendMessage("Hey you 🚀,\nThanks a lot for using the bot,\n\n\nFeel free to contribute on Github: https://github.com/eleboucher/berlin-vaccine-alert\n\n\nOr feel free to contribute on Paypal https://paypal.me/ELeboucher or Buy me a beer https://www.buymeacoffee.com/eleboucher", update.Message.Chat.ID)
 				if err != nil {
